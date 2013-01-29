@@ -7,11 +7,25 @@ html, body {
   background-color: #f7f7f7;
 }
 
-.stack h1 {
+h1 {
+  color: #444;
+}
+
+h2, h3, h4, h5, h6 {
   font-weight: 400;
   color: #444;
 }
 
 .center {
   text-align: center;
+}
+
+.contact > img {
+  padding-right: 20px;
+  vertical-align: middle;
+  width: 64px;
+}
+
+.contact > a {
+  vertical-align: middle;
 }
