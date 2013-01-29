@@ -1,0 +1,17 @@
+html, body {
+  font-family: 'Ubuntu', sans-serif;
+}
+
+.stack {
+  color: #222;
+  background-color: #f7f7f7;
+}
+
+.stack h1 {
+  font-weight: 400;
+  color: #444;
+}
+
+.center {
+  text-align: center;
+}
