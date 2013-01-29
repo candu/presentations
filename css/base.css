@@ -13,6 +13,16 @@ html, body {
   background-color: rgba(255, 255, 255, 0);
 }
 
+.stack.chapter {
+  color: #f7f7f7;
+  background-color: #222;
+}
+
+.stack.chapter h1 {
+  font-size: 250%;
+  color: #ddd;
+}
+
 h1 {
   color: #444;
 }
@@ -20,6 +30,20 @@ h1 {
 h2, h3, h4, h5, h6 {
   font-weight: 400;
   color: #444;
+}
+
+blockquote {
+  font-style: italic;
+  font-weight: 400;
+  padding: 0.2em 0 0.2em 0.5em;
+  border-left: 0.1em solid #ccc;
+}
+
+blockquote > footer {
+  font-style: normal;
+  font-weight: 400;
+  padding-top: 0.5em;
+  font-size: 75%;
 }
 
 .center {
