@@ -10,7 +10,7 @@ function visualizeData(ds) {
     .x(d3.scale.linear()
         .domain([0, 85])
         .rangeRound([0, 850]));
-  var charts = [chart];
+  var charts = [chart, chart];
   var chartDivs = d3.selectAll('.chart')
     .data(charts);
 
