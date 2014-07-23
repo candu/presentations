@@ -41,6 +41,7 @@
       </blockquote>
     </section>
     <section class="center">
+      <div class="title">the minimum timeout is &gt;0 ms</div>
       <pre><code data-code-target="#js_min_timeout"></code></pre>
       <button id="btn_min_timeout">run it!</button>
       <script id="js_min_timeout">
@@ -54,6 +55,7 @@
       </script>
     </section>
     <section class="center">
+      <div class="title">yes, this applies to setInterval()</div>
       <pre><code data-code-target="#js_timer_resolution"></code></pre>
       <button id="btn_timer_resolution">run it!</button>
       <script id="js_timer_resolution">
@@ -71,6 +73,15 @@
       </script>
     </section>
     <section class="center">
+      <div class="title">the postMessage() trick</div>
+      <pre><code data-code-target="#js_post_message"></code></pre>
+      <button id="btn_post_message">run it!</button>
+      <script id="js_post_message">
+  // TODO: this
+      </script>
+    </section>
+    <section class="center">
+      <div class="title">events wait their turn</div>
       <pre><code data-code-target="#js_timeout_waiting"></code></pre>
       <button id="btn_timeout_waiting">run it!</button>
       <script id="js_timeout_waiting">
@@ -85,6 +96,7 @@
       </script>
     </section>
     <section class="center">
+      <div class="title">DOM updates wait their turn</div>
       <pre><code data-code-target="#js_dom_waiting"></code></pre>
       <button id="btn_dom_waiting">run it!</button>
       <script id="js_dom_waiting">
@@ -97,6 +109,7 @@
       </script>
     </section>
     <section class="center">
+      <div class="title">the setTimeout(..., 0) trick</div>
       <pre><code data-code-target="#js_dom_waiting_fixed"></code></pre>
       <button id="btn_dom_waiting_fixed">run it!</button>
       <script id="js_dom_waiting_fixed">
@@ -111,6 +124,7 @@
       </script>
     </section>
     <section class="center">
+      <div class="title">events are queued, part 1</div>
       <pre><code data-code-target="#js_event_queue"></code></pre>
       <button id="btn_event_queue">run it!</button>
       <div id="output_event_queue"></div>
@@ -128,6 +142,7 @@
       </script>
     </section>
     <section class="center">
+      <div class="title">events are queued, part 2</div>
       <pre><code data-code-target="#js_event_queue_fixed"></code></pre>
       <button id="btn_event_queue_fixed">run it!</button>
       <div id="output_event_queue_fixed"></div>
@@ -142,6 +157,87 @@
       }, wait);  // timeout wait...
     })
   });
+      </script>
+    </section>
+    <section class="center">
+      <h2>JavaScript is <strong>NOT</strong> concurrent!</h2>
+    </section>
+    <section class="chapter center">
+      <h1>i'll have my people call your people</h1>
+    </section>
+    <section class="center">
+      <div class="title">$.ajax(), old-style</div>
+      <pre><code data-code-target="#js_ajax_old_style"></code></pre>
+      <button id="btn_ajax_old_style">run it!</button>
+      <script id="js_ajax_old_style">
+  $('#btn_ajax_old_style').click(function() {
+    $.getJSON('json/a.json', function(a) {
+      alert(JSON.stringify(a));
+    });
+  });
+      </script>
+    </section>
+    <section class="center">
+      <div class="title">the pyramid of doom</div>
+      <pre><code data-code-target="#js_pyramid_of_doom"></code></pre>
+      <button id="btn_pyramid_of_doom">run it!</button>
+      <script id="js_pyramid_of_doom">
+  $('#btn_pyramid_of_doom').click(function() {
+    $.getJSON('json/a.json', function(a) {
+      $.getJSON('json/b.json', function(b) {
+        $.getJSON('json/c.json', function(c) {
+          alert(JSON.stringify([a, b, c]));
+        });
+      });
+    });
+  });
+      </script>
+    </section>
+    <section class="center">
+      <div class="title">named callbacks</div>
+      <pre><code data-code-target="#js_named_callbacks"></code></pre>
+      <button id="btn_named_callbacks">run it!</button>
+      <script id="js_named_callbacks">
+  function a(doneA, doneB) {
+    $.getJSON('json/a.json', function(a) { doneA(a, doneB); }); }
+  function b(a, doneB) {
+    $.getJSON('json/b.json', function(b) { doneB(a, b); }); }
+  function c(a, b) {
+    $.getJSON('json/c.json', function(c) {
+      alert(JSON.stringify([a, b, c]));
+    }); }
+  $('#btn_named_callbacks').click(function() { a(b, c) });
+      </script>
+    </section>
+    <section class="center">
+      <div class="title">DIY series execution</div>
+      <pre><code data-code-target="#js_series_execution"></code></pre>
+      <button id="btn_series_execution">run it!</button>
+      <script id="js_series_execution">
+  function series(urls, done) {
+    if (urls.length === 0) done([]);
+    $.getJSON(urls.shift(), function(first) {
+      series(urls, function(rest) {
+        done([first].concat(rest)); }); }); };
+  $('#btn_series_execution').click(function() {
+    series(['json/a.json', 'json/b.json', 'json/c.json'], function(abc) {
+      alert(JSON.stringify(abc)); }) });
+      </script>
+    </section>
+    <section class="center">
+      <div class="title">DIY parallel execution</div>
+      <pre><code data-code-target="#js_parallel_execution"></code></pre>
+      <button id="btn_parallel_execution">run it!</button>
+      <script id="js_parallel_execution">
+  function parallel(urls, done) {
+    var numDone = 0, n = urls.length, results = new Array(n);
+    _.each(urls, function(url, i) {
+      $.getJSON(url, function(result) {
+        results[i] = result;
+        if (++numDone === n) done(results); }); }); }
+  $('#btn_parallel_execution').click(function() {
+    parallel(['json/a.json', 'json/b.json', 'json/c.json'], function(abc) {
+      alert(JSON.stringify(abc)); }) });
       </script>
     </section>
     <!-- stack.js -->
