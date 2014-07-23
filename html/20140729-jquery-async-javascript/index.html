@@ -110,6 +110,23 @@
   });
       </script>
     </section>
+    <section class="center">
+      <pre><code data-code-target="#js_event_queue"></code></pre>
+      <button id="btn_event_queue">run it!</button>
+      <div id="output_event_queue"></div>
+      <script id="js_event_queue">
+  $('#btn_event_queue').click(function() {
+    $('#output_event_queue').empty();
+    _.each(_.range(10), function(i) {
+      window.setTimeout(function() {
+        var start = new Date(), wait = Math.floor(200 * Math.random());
+        while (new Date() - start < wait) {}  // busy wait...
+        $('<span />').text(i).appendTo($('#output_event_queue'));
+      }, 0);
+    })
+  });
+      </script>
+    </section>
     <!-- stack.js -->
     <script src="/js/d3.js?2.7.3"></script>
     <script src="/js/stack.js"></script>
