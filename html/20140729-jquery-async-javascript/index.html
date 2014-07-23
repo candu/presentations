@@ -170,10 +170,11 @@
       <pre><code data-code-target="#js_ajax_old_style"></code></pre>
       <button id="btn_ajax_old_style">run it!</button>
       <script id="js_ajax_old_style">
+  function alertJSON(value) {
+    alert(JSON.stringify(value));
+  }
   $('#btn_ajax_old_style').click(function() {
-    $.getJSON('json/a.json', function(a) {
-      alert(JSON.stringify(a));
-    });
+    $.getJSON('json/a.json', alertJSON);
   });
       </script>
     </section>
@@ -186,7 +187,7 @@
     $.getJSON('json/a.json', function(a) {
       $.getJSON('json/b.json', function(b) {
         $.getJSON('json/c.json', function(c) {
-          alert(JSON.stringify([a, b, c]));
+          alertJSON([a, b, c]);
         });
       });
     });
@@ -204,7 +205,7 @@
     $.getJSON('json/b.json', function(b) { doneB(a, b); }); }
   function c(a, b) {
     $.getJSON('json/c.json', function(c) {
-      alert(JSON.stringify([a, b, c]));
+      alertJSON([a, b, c]);
     }); }
   $('#btn_named_callbacks').click(function() { a(b, c) });
       </script>
@@ -214,14 +215,15 @@
       <pre><code data-code-target="#js_series_execution"></code></pre>
       <button id="btn_series_execution">run it!</button>
       <script id="js_series_execution">
+  var urls = _.map('abc', function(x) { return 'json/' + x + '.json'; });
+
   function series(urls, done) {
     if (urls.length === 0) done([]);
-    $.getJSON(urls.shift(), function(first) {
-      series(urls, function(rest) {
+    $.getJSON(urls[0], function(first) {
+      series(urls.slice(1), function(rest) {
         done([first].concat(rest)); }); }); };
   $('#btn_series_execution').click(function() {
-    series(['json/a.json', 'json/b.json', 'json/c.json'], function(abc) {
-      alert(JSON.stringify(abc)); }) });
+    series(urls, alertJSON) });
       </script>
     </section>
     <section class="center">
@@ -230,15 +232,112 @@
       <button id="btn_parallel_execution">run it!</button>
       <script id="js_parallel_execution">
   function parallel(urls, done) {
+    if (urls.length === 0) { done([]); }
     var numDone = 0, n = urls.length, results = new Array(n);
     _.each(urls, function(url, i) {
       $.getJSON(url, function(result) {
         results[i] = result;
         if (++numDone === n) done(results); }); }); }
   $('#btn_parallel_execution').click(function() {
-    parallel(['json/a.json', 'json/b.json', 'json/c.json'], function(abc) {
-      alert(JSON.stringify(abc)); }) });
+    parallel(urls, alertJSON); });
       </script>
+    </section>
+    <section class="chapter center">
+      <h1>everything but the kitchen async</h1>
+    </section>
+    <section class="center">
+      <div class="title">node-style callbacks</div>
+      <pre><code data-code-target="#js_node_callbacks"></code></pre>
+      <button id="btn_node_callbacks">run it!</button>
+      <script id="js_node_callbacks">
+  function task(url) {
+    return function(callback) {
+      $.getJSON(url, function(result) { callback(null, result); });
+    };
+  }
+  $('#btn_node_callbacks').click(function() {
+    task('json/a.json')(function(err, a) { alertJSON(a); });
+  });
+      </script>
+    </section>
+    <section class="center">
+      <div class="title">async.series()</div>
+      <pre><code data-code-target="#js_series_async"></code></pre>
+      <button id="btn_series_async">run it!</button>
+      <script id="js_series_async">
+  $('#btn_series_async').click(function() {
+    async.series(_.map(urls, task), function(err, abc) {
+      alertJSON(abc);
+    });
+  });
+      </script>
+    </section>
+    <section class="center">
+      <div class="title">async.parallel()</div>
+      <pre><code data-code-target="#js_parallel_async"></code></pre>
+      <button id="btn_parallel_async">run it!</button>
+      <script id="js_parallel_async">
+  $('#btn_parallel_async').click(function() {
+    async.parallel(_.map(urls, task), function(err, abc) {
+      alertJSON(abc);
+    });
+  });
+      </script>
+    </section>
+    <section class="chapter center">
+      <h1>i'll be back, i promise</h1>
+    </section>
+    <section class="center">
+      <div class="title">$.ajax(), new-style</div>
+      <pre><code data-code-target="#js_ajax_new_style"></code></pre>
+      <button id="btn_ajax_new_style">run it!</button>
+      <script id="js_ajax_new_style">
+  /* old-style:
+   *
+   * $.getJSON('json/a.json', function(a) {
+   *   alert(JSON.stringify(a));
+   * });
+   */
+  $('#btn_ajax_new_style').click(function() {
+    $.getJSON('json/a.json').done(alertJSON);
+  });
+      </script>
+    </section>
+    <section class="center">
+      <div class="title">deferreds and promises</div>
+      <pre><code data-code-target="#js_deferreds"></code></pre>
+      <button id="btn_deferreds">run it!</button>
+      <script id="js_deferreds">
+  function getJsonNew(url) {
+    var d = new $.Deferred();
+    $.getJSON(url, d.resolve.bind(d));
+    return d.promise();
+  }
+  $('#btn_deferreds').click(function() {
+    getJsonNew('json/a.json').done(alertJSON);
+  });
+      </script>
+    </section>
+    <section class="chapter center">
+      <h1>event planning</h1>
+    </section>
+    <section class="chapter center">
+      <h1>alright, i yield!</h1>
+    </section>
+    <section class="chapter center">
+      <h1>further reading</h1>
+    </section>
+    <section class="center">
+      <h1>Async JavaScript</h1>
+      <h2>Evan Savage</h2>
+      <div class="contact">
+        <img src="/img/github.png"></img>
+        <a href="https://github.com/candu">candu</a>
+      </div>
+      <div class="contact">
+        <img src="/img/twitter.png"></img>
+        <a href="https://twitter.com/candusavage">@candusavage</a>
+      </div>
     </section>
     <!-- stack.js -->
     <script src="/js/d3.js?2.7.3"></script>
