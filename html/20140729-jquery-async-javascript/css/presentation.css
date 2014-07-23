@@ -1,0 +1,9 @@
+pre > code {
+  font-size: 1.5rem;
+  text-align: left;
+}
+
+button {
+  cursor: pointer;
+  font-size: 80%;
+}

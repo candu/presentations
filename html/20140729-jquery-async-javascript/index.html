@@ -6,9 +6,9 @@
     <link rel="stylesheet" type="text/css" href="/css/stack.css">
     <link rel="stylesheet" type="text/css" href="/css/webfonts.css">
     <link rel="stylesheet" type="text/css" href="/css/base.css">
+    <link rel="stylesheet" type="text/css" href="css/presentation.css">
 
     <script src="/js/highlight-8.0.js"></script>
-    <script>hljs.initHighlightingOnLoad();</script>
     <link rel="stylesheet" type="text/css" href="/css/solarized_dark.css">
 
     <script src="/js/jquery-2.1.1.js"></script>
@@ -27,7 +27,7 @@
         <img src="/img/twitter.png"></img>
         <a href="https://twitter.com/candusavage">@candusavage</a>
       </div>
-    </section>  
+    </section>
     <section class="chapter center">
       <h1>i said right this second!</h1>
     </section>
@@ -40,8 +40,88 @@
         </footer>
       </blockquote>
     </section>
+    <section class="center">
+      <pre><code data-code-target="#js_min_timeout"></code></pre>
+      <button id="btn_min_timeout">run it!</button>
+      <script id="js_min_timeout">
+  $('#btn_min_timeout').click(function() {
+    var start = new Date();
+    window.setTimeout(function() {
+      var elapsed = new Date() - start;
+      alert('elapsed: ' + elapsed + ' ms');
+    }, 0);
+  });
+      </script>
+    </section>
+    <section class="center">
+      <pre><code data-code-target="#js_timer_resolution"></code></pre>
+      <button id="btn_timer_resolution">run it!</button>
+      <script id="js_timer_resolution">
+  $('#btn_timer_resolution').click(function() {
+    var start = new Date(), numCalls = 0;
+    var interval = window.setInterval(function() {
+      var elapsed = new Date() - start;
+      if (elapsed >= 1000) {
+        window.clearInterval(interval);
+        alert('numCalls: ' + numCalls);
+      }
+      numCalls++;
+    }, 0);
+  });
+      </script>
+    </section>
+    <section class="center">
+      <pre><code data-code-target="#js_timeout_waiting"></code></pre>
+      <button id="btn_timeout_waiting">run it!</button>
+      <script id="js_timeout_waiting">
+  $('#btn_timeout_waiting').click(function() {
+    var start = new Date();
+    window.setTimeout(function() {
+      var elapsed = new Date() - start;
+      alert('elapsed: ' + elapsed + ' ms');
+    }, 0);
+    while (new Date() - start < 1000) {}  // busy wait...
+  });
+      </script>
+    </section>
+    <section class="center">
+      <pre><code data-code-target="#js_dom_waiting"></code></pre>
+      <button id="btn_dom_waiting">run it!</button>
+      <script id="js_dom_waiting">
+  $('#btn_dom_waiting').click(function() {
+    $('#btn_dom_waiting').css('background-color', '#f00');
+    var start = new Date();
+    while (new Date() - start < 1000) {}  // busy wait...
+    $('#btn_dom_waiting').css('background-color', '#ff0');
+  });
+      </script>
+    </section>
+    <section class="center">
+      <pre><code data-code-target="#js_dom_waiting_fixed"></code></pre>
+      <button id="btn_dom_waiting_fixed">run it!</button>
+      <script id="js_dom_waiting_fixed">
+  $('#btn_dom_waiting_fixed').click(function() {
+    $('#btn_dom_waiting_fixed').css('background-color', '#f00');
+    var start = new Date();
+    window.setTimeout(function() {
+      while (new Date() - start < 1000) {}  // busy wait...
+      $('#btn_dom_waiting_fixed').css('background-color', '#ff0');
+    }, 0);
+  });
+      </script>
+    </section>
     <!-- stack.js -->
     <script src="/js/d3.js?2.7.3"></script>
     <script src="/js/stack.js"></script>
+    <!-- highlighting -->
+    <script>
+    $(document).ready(function() {
+      $('pre > code').each(function(i, block) {
+        var codeTarget = $(block).data('codeTarget');
+        $(block).text($(codeTarget).html());
+        hljs.highlightBlock(block);
+      });
+    });
+    </script>
   </body>
 </html>
