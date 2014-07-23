@@ -127,6 +127,23 @@
   });
       </script>
     </section>
+    <section class="center">
+      <pre><code data-code-target="#js_event_queue_fixed"></code></pre>
+      <button id="btn_event_queue_fixed">run it!</button>
+      <div id="output_event_queue_fixed"></div>
+      <script id="js_event_queue_fixed">
+  $('#btn_event_queue_fixed').click(function() {
+    $('#output_event_queue_fixed').empty();
+    _.each(_.range(10), function(i) {
+      var wait = Math.floor(200 * Math.random());
+      window.setTimeout(function() {
+        var start = new Date();
+        $('<span />').text(i).appendTo($('#output_event_queue_fixed'));
+      }, wait);  // timeout wait...
+    })
+  });
+      </script>
+    </section>
     <!-- stack.js -->
     <script src="/js/d3.js?2.7.3"></script>
     <script src="/js/stack.js"></script>
