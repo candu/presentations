@@ -62,8 +62,7 @@
   $('#btn_timer_resolution').click(function() {
     var start = new Date(), numCalls = 0;
     var interval = window.setInterval(function() {
-      var elapsed = new Date() - start;
-      if (elapsed >= 1000) {
+      if (new Date() - start >= 1000) {
         window.clearInterval(interval);
         alert('numCalls: ' + numCalls);
       }
@@ -75,9 +74,38 @@
     <section class="center">
       <div class="title">the postMessage() trick</div>
       <pre><code data-code-target="#js_post_message"></code></pre>
-      <button id="btn_post_message">run it!</button>
       <script id="js_post_message">
-  // TODO: this
+  (function() {
+    var callbacks = [];
+    window.addEventListener('message', function(event) {
+      if (event.source == window && event.data == '__zero_timeout__') {
+        event.stopPropagation();
+        if (callbacks.length > 0) (callbacks.shift())();
+      }
+    }, true);
+    window.setZeroTimeout = function(callback) {
+      callbacks.push(callback);
+      window.postMessage('__zero_timeout__', '*');
+    };
+  })();
+      </script>
+    </section>
+    <section class="center">
+      <div class="title">the postMessage() trick in action</div>
+      <pre><code data-code-target="#js_post_message_action"></code></pre>
+      <button id="btn_post_message_action">run it!</button>
+      <script id="js_post_message_action">
+  $('#btn_post_message_action').click(function() {
+    var start = new Date(), numCalls = 0;
+    function callback() {
+      if (new Date() - start >= 1000) {
+        return alert('numCalls: ' + numCalls);
+      }
+      numCalls++;
+      window.setZeroTimeout(callback);
+    }
+    window.setZeroTimeout(callback);
+  });
       </script>
     </section>
     <section class="center">
