@@ -480,8 +480,63 @@
   });
       </script>
     </section>
+    <section class="center">
+      <div class="title">generators from promises</div>
+      <pre><code data-code-target="#js_generators_from_promises"></code></pre>
+      <button id="btn_generators_from_promises">run it!</button>
+      <script id="js_generators_from_promises">
+  function genPromise(p) {
+    // TODO: this
+  }
+  function gen(url) {
+    return genPromise($.getJSON(url));
+  }
+  $('#btn_generators_from_promises').click(function() {
+    var a = yield gen('json/a.json');
+    var b = yield gen('json/b.json');
+    var c = yield gen('json/c.json');
+    alertJSON([a, b, c]);
+  });
+      </script>
+    </section>
+    <section class="center">
+      <div class="title">genAll()</div>
+      <pre><code data-code-target="#js_gen_all"></code></pre>
+      <button id="btn_gen_all">run it!</button>
+      <script id="js_gen_all">
+  function genAll(gens) {
+  }
+  $('#btn_gen_all').click(function() {
+    var results = yield genAll(_.map(urls, gen));
+    alertJSON(results);
+  });
+      </script>
+    </section>
+    <section class="center">
+      <div class="title">generators from callbacks</div>
+      <pre><code data-code-target="#js_generators_from_callbacks"></code></pre>
+      <button id="btn_generators_from_callbacks">run it!</button>
+      <script id="js_generators_from_callbacks">
+  function genCallback(fn) {
+    // TODO: this
+  }
+  $('#btn_generators_from_callbacks').click(function() {
+    var a = yield genCallback(task('json/a.json'));
+    alertJSON(a);
+  });
+      </script>
+    </section>
+    <section class="center">
+      <div class="title">DIY generators?</div>
+      <h2><a href="#">sort of</a></h2>
+    </section>
     <section class="chapter center">
       <h1>further reading</h1>
+    </section>
+    <section>
+      <ul>
+        <li>TODO: this</li>
+      </ul>
     </section>
     <section class="center">
       <h1>Async JavaScript</h1>
