@@ -29,6 +29,13 @@
       </div>
     </section>
     <section class="chapter center">
+      <h1>before you start</h1>
+    </section>
+    <section class="center">
+      <div class="title">Chrome users:<div>
+      <h2><a target="_blank" href="https://plus.google.com/+PaulIrish/posts/T615Md5JPQG">enable Harmony!</a></h2>
+    </section>
+    <section class="chapter center">
       <h1>i said right this second!</h1>
     </section>
     <section>
@@ -365,6 +372,25 @@
   $('#btn_promises_action').click(function() {
     getJsonDiyPromise('json/a.json').done(alertJSON);
   });
+      </script>
+    </section>
+    <section class="center">
+      <div class="title">Promise.all()</div>
+      <pre><code data-code-target="#js_promises_all"></code></pre>
+      <button id="btn_promises_all">run it!</button>
+      <script id="js_promises_all">
+  Promise.all = function(ps) {
+    var P = new Promise();
+    if (ps.length === 0) { P.resolve([]); }
+    var numDone = 0, n = ps.length, results = new Array(n);
+    _.each(ps, function(p, i) {
+      p.done(function(result) {
+        results[i] = result;
+        if (++numDone === n) P.resolve(results); }); });
+    return P; };
+  $('#btn_promises_all').click(function() {
+    var ps = _.map(urls, getJsonDiyPromise);
+    Promise.all(ps).done(alertJSON); });
       </script>
     </section>
     <section class="chapter center">
