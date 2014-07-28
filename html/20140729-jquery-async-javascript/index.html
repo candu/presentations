@@ -394,7 +394,71 @@
       </script>
     </section>
     <section class="chapter center">
-      <h1>event planning</h1>
+      <h1>what's the big event?</h1>
+    </section>
+    <section class="center">
+      <div class="title">$.on(), $.trigger()</div>
+      <pre><code data-code-target="#js_jquery_custom_events"></code></pre>
+      <button id="btn_jquery_custom_events">run it!</button>
+      <script id="js_jquery_custom_events">
+  $('#btn_jquery_custom_events').on('foo', function() {
+    alert('foo');
+  }).click(function() {
+    window.setTimeout(function() {
+      $('#btn_jquery_custom_events').trigger('foo');
+    }, 1000);
+  });
+      </script>
+    </section>
+    <section class="center">
+      <div class="title">DIY event dispatcher, part 1</div>
+      <pre><code data-code-target="#js_event_dispatcher"></code></pre>
+      <script id="js_event_dispatcher">
+  var EventDispatcher = function() {
+    this._callbacks = {}; };
+  EventDispatcher.prototype.trigger = function(type /* arg, ... */) {
+    if (!_.has(this._callbacks, type)) return;
+    var args = Array.prototype.slice.call(arguments, 1);
+    _.each(this._callbacks[type], function(callback) {
+      callback.apply(null, args); }); };
+  EventDispatcher.prototype.on = function(type, callback) {
+    if (!_.has(this._callbacks, type)) {
+      this._callbacks[type] = [];
+    }
+    this._callbacks[type].push(callback); };
+      </script>
+    </section>
+    <section class="center">
+      <div class="title">DIY event dispatcher, part 2</div>
+      <pre><code data-code-target="#js_event_dispatcher_action"></code></pre>
+      <button id="btn_event_dispatcher_action">run it!</button>
+      <script id="js_event_dispatcher_action">
+  var dispatcher = new EventDispatcher();
+  dispatcher.on('foo', function() {
+    alert('foo');
+  });
+  $('#btn_event_dispatcher_action').click(function() {
+    window.setTimeout(function() {
+      dispatcher.trigger('foo');
+    }, 1000);
+  });
+      </script>
+    </section>
+    <section class="center">
+      <div class="title">event evaluation is synchronous</div>
+      <pre><code data-code-target="#js_event_dom_waiting"></code></pre>
+      <button id="btn_event_dom_waiting">run it!</button>
+      <script id="js_event_dom_waiting">
+  dispatcher.on('bar', function() {
+    $('#btn_event_dom_waiting').css('background-color', '#ff0');
+  });
+  $('#btn_event_dom_waiting').click(function() {
+    $('#btn_event_dom_waiting').css('background-color', '#f00');
+    var start = new Date();
+    while (new Date() - start < 1000) {}  // busy wait...
+    dispatcher.trigger('bar');
+  });
+      </script>
     </section>
     <section class="chapter center">
       <h1>alright, i yield!</h1>
