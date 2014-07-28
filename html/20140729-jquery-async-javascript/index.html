@@ -41,21 +41,7 @@
       </blockquote>
     </section>
     <section class="center">
-      <div class="title">the minimum timeout is &gt;0 ms</div>
-      <pre><code data-code-target="#js_min_timeout"></code></pre>
-      <button id="btn_min_timeout">run it!</button>
-      <script id="js_min_timeout">
-  $('#btn_min_timeout').click(function() {
-    var start = new Date();
-    window.setTimeout(function() {
-      var elapsed = new Date() - start;
-      alert('elapsed: ' + elapsed + ' ms');
-    }, 0);
-  });
-      </script>
-    </section>
-    <section class="center">
-      <div class="title">yes, this applies to setInterval()</div>
+      <div class="title">timer resolution is ~4 ms</div>
       <pre><code data-code-target="#js_timer_resolution"></code></pre>
       <button id="btn_timer_resolution">run it!</button>
       <script id="js_timer_resolution">
@@ -72,7 +58,7 @@
       </script>
     </section>
     <section class="center">
-      <div class="title">the postMessage() trick</div>
+      <div class="title">the postMessage() trick, part 1</div>
       <pre><code data-code-target="#js_post_message"></code></pre>
       <script id="js_post_message">
   (function() {
@@ -91,7 +77,7 @@
       </script>
     </section>
     <section class="center">
-      <div class="title">the postMessage() trick in action</div>
+      <div class="title">the postMessage() trick, part 2</div>
       <pre><code data-code-target="#js_post_message_action"></code></pre>
       <button id="btn_post_message_action">run it!</button>
       <script id="js_post_message_action">
@@ -346,11 +332,63 @@
   });
       </script>
     </section>
+    <section class="center">
+      <div class="title">DIY promises, part 1</div>
+      <pre><code data-code-target="#js_promises"></code></pre>
+      <script id="js_promises">
+  var Promise = function() {
+    this._callbacks = [];
+    this._done = false;
+  };
+  Promise.prototype.resolve = function(value) {
+    this._done = true;
+    this._value = value;
+    _.each(this._callbacks, function(callback) {
+      callback(value); });
+    return this; };
+  Promise.prototype.done = function(callback) {
+    if (this._done) return callback(this._value);
+    this._callbacks.push(callback);
+    return this; };
+      </script>
+    </section>
+    <section class="center">
+      <div class="title">DIY promises, part 2</div>
+      <pre><code data-code-target="#js_promises_action"></code></pre>
+      <button id="btn_promises_action">run it!</button>
+      <script id="js_promises_action">
+  function getJsonDiyPromise(url) {
+    var p = new Promise();
+    $.getJSON(url, p.resolve.bind(p));
+    return p;
+  };
+  $('#btn_promises_action').click(function() {
+    getJsonDiyPromise('json/a.json').done(alertJSON);
+  });
+      </script>
+    </section>
     <section class="chapter center">
       <h1>event planning</h1>
     </section>
     <section class="chapter center">
       <h1>alright, i yield!</h1>
+    </section>
+    <section class="center">
+      <div class="title">ES6 generators</div>
+      <pre><code data-code-target="#js_generators"></code></pre>
+      <button id="btn_generators">run it!</button>
+      <script id="js_generators">
+  function* genIdMaker() {
+    var nextId = 0;
+    while (true) {
+      yield nextId++;
+    }
+  }
+  var idMaker = genIdMaker();
+  $('#btn_generators').click(function() {
+    alert('nextId: ' + idMaker.next().value);
+  });
+      </script>
     </section>
     <section class="chapter center">
       <h1>further reading</h1>
