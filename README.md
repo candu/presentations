@@ -1,3 +1,3 @@
-# candu's presentations
+# Evan Savage: Interactive Presentations
 
-and other related files.
+[View the list of presentations](https://candu.github.io/presentations/).
