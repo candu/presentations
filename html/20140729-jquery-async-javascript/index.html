@@ -3,28 +3,28 @@
   <head>
     <meta charset='utf-8'>
     <link rel="shortcut icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAAAAABoAwAAFgAAACgAAAAQAAAAIAAAAAEAGAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAvIuwvIuwvIuwAAAMHBSguIewvIuwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAvIuwvIuwvIuwvIusvIuwvIuwvIuwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAvIuwvIuwvIuwvIusvIuwvIuwvIuwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAvIuwvIuwvIuwvIesvIuwvIuwvIuwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAjGbEvIuwvIuwvIuwvIuwvIuwvIuwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAvIuwvIuwvIuwpHtQvIuwvIuwvIuwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAvIuwvIuwvIuwvIuw1J+wvIuwvIuwvIuwvIuwAAAAAAAAAAAAAAAAAAAAAAAAvIuwvIuwvIuwvIuwcFJQAAAAQCk8vIuwvIuwvIuwvIuwAAAAAAAAAAAAAAAAAAAAvIuwvIuwvIuwAAAAeNRJoh1ZSjS1uZe0vIuwvIuwvIuwAAAAAAAAAAAAAAAAAAAAvIuwvIuwvIuwAAABDdCUBAQBRjCwLCDovIuwvIuwvIuwAAAAAAAAAAAAAAAAAAAAsIOAvIuwvIuwvIuxSjS0pRhYHCg4vIuwvIuwvIuwuIecAAAAAAAAAAAAAAAAAAAAAAAAkGtgvIuwvIuwvIusvIuwvIuwvIuwvIuwFAxkOC00AAAAAAAAAAAAAAAAAAAAAAAAvIuwjGrsvIuwuIekvIuwuJOQqHtcDAg8vIuwvIuwAAAAAAAAAAAAAAAAAAAAAAAAvIuwvIuwOCkovIuwvIuwvIuwvIuwvIuwvIuwRDGAAAAAAAAAAAAAAAAAAAAAAAAAvIuwvIuwkGrgvIuwvIuwcFI0vIuwvIuwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIBi0vIuwvIuwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADxnwAA8B8AAPAfAADwHwAA8B8AAPAfAADgDwAAw4cAAMcHAADFRwAAwYcAAOAfAADgJwAA5A8AAOCfAAD8/wAA" />
-    <link rel="stylesheet" type="text/css" href="/css/stack.css">
-    <link rel="stylesheet" type="text/css" href="/css/webfonts.css">
-    <link rel="stylesheet" type="text/css" href="/css/base.css">
+    <link rel="stylesheet" type="text/css" href="../../css/stack.css">
+    <link rel="stylesheet" type="text/css" href="../../css/webfonts.css">
+    <link rel="stylesheet" type="text/css" href="../../css/base.css">
     <link rel="stylesheet" type="text/css" href="css/presentation.css">
 
-    <script src="/js/highlight-8.0.js"></script>
-    <link rel="stylesheet" type="text/css" href="/css/solarized_dark.css">
+    <script src="../../js/highlight-8.0.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../css/solarized_dark.css">
 
-    <script src="/js/jquery-2.1.1.js"></script>
-    <script src="/js/underscore-1.6.0.js"></script>
-    <script src="/js/async.js"></script>
+    <script src="../../js/jquery-2.1.1.js"></script>
+    <script src="../../js/underscore-1.6.0.js"></script>
+    <script src="../../js/async.js"></script>
   </head>
   <body>
     <section class="center">
       <h1>Async JavaScript</h1>
       <h2>Evan Savage</h2>
       <div class="contact">
-        <img src="/img/github.png"></img>
+        <img src="../../img/github.png"></img>
         <a href="https://github.com/candu">candu</a>
       </div>
       <div class="contact">
-        <img src="/img/twitter.png"></img>
+        <img src="../../img/twitter.png"></img>
         <a href="https://twitter.com/candusavage">@candusavage</a>
       </div>
     </section>
@@ -179,9 +179,6 @@
     })
   });
       </script>
-    </section>
-    <section class="center">
-      <h2>JavaScript is <strong>NOT</strong> concurrent!</h2>
     </section>
     <section class="chapter center">
       <h1>i'll have my people call your people</h1>
@@ -484,18 +481,35 @@
       <div class="title">generators from promises</div>
       <pre><code data-code-target="#js_generators_from_promises"></code></pre>
       <button id="btn_generators_from_promises">run it!</button>
+      <script>
+var GenPromise = function(p) {
+  this._p = p;
+  this._g = this._createGenerator();
+  this._p.done(function(result) {
+    this._g.next(result);
+  }.bind(this));
+};
+GenPromise.prototype._createGenerator = function*() {
+  var result = yield null;
+  yield result;
+};
+GenPromise.prototype.gen = function() {
+  return this._g;
+};
+function gen(url) {
+  return new GenPromise($.getJSON(url)).gen();
+}
+      </script>
       <script id="js_generators_from_promises">
-  function genPromise(p) {
-    // TODO: this
-  }
-  function gen(url) {
-    return genPromise($.getJSON(url));
-  }
+  var genABCSeries = function*() {
+    var a = yield* gen('json/a.json');
+    var b = yield* gen('json/b.json');
+    var c = yield* gen('json/c.json');
+    yield [a, b, c];
+  };
   $('#btn_generators_from_promises').click(function() {
-    var a = yield gen('json/a.json');
-    var b = yield gen('json/b.json');
-    var c = yield gen('json/c.json');
-    alertJSON([a, b, c]);
+    var abc = genABCSeries().next().value;
+    alertJSON(abc);
   });
       </script>
     </section>
@@ -506,7 +520,7 @@
       <script id="js_gen_all">
   function genAll(gens) {
   }
-  $('#btn_gen_all').click(function() {
+  $('#btn_gen_all').click(function*() {
     var results = yield genAll(_.map(urls, gen));
     alertJSON(results);
   });
@@ -520,7 +534,7 @@
   function genCallback(fn) {
     // TODO: this
   }
-  $('#btn_generators_from_callbacks').click(function() {
+  $('#btn_generators_from_callbacks').click(function*() {
     var a = yield genCallback(task('json/a.json'));
     alertJSON(a);
   });
@@ -542,17 +556,17 @@
       <h1>Async JavaScript</h1>
       <h2>Evan Savage</h2>
       <div class="contact">
-        <img src="/img/github.png"></img>
+        <img src="../../img/github.png"></img>
         <a href="https://github.com/candu">candu</a>
       </div>
       <div class="contact">
-        <img src="/img/twitter.png"></img>
+        <img src="../../img/twitter.png"></img>
         <a href="https://twitter.com/candusavage">@candusavage</a>
       </div>
     </section>
     <!-- stack.js -->
-    <script src="/js/d3.js?2.7.3"></script>
-    <script src="/js/stack.js"></script>
+    <script src="../../js/d3.js?2.7.3"></script>
+    <script src="../../js/stack.js"></script>
     <!-- highlighting -->
     <script>
     $(document).ready(function() {
