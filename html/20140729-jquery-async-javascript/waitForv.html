@@ -12,7 +12,6 @@ var DB = {
 };
 
 function query(ids) {
-  console.log('query:', ids);
   var result = {};
   _.each(ids, function fetchById(id) {
     result[id] = null;
@@ -49,7 +48,6 @@ var DT = (function() {
   };
   _DT.dispatch = function() {
     _.each(_instances, function(instance, name) {
-      console.log('DT dispatch: ', name);
       instance.dispatch();
     });
   };
@@ -69,7 +67,6 @@ AbstractDataType.prototype.dispatch = function() {
   if (_.isEmpty(ids)) {
     return;
   }
-  console.log('AbstractDataType dispatch: ', ids);
   var values = this.fetch(ids);
   _.each(ids, function(id) {
     var key = this.cacheKey(id);
@@ -80,12 +77,10 @@ AbstractDataType.prototype.gen = function*(ids) {
   if (!(ids instanceof Array)) {
     ids = [ids];
   }
-  console.log('gen: ', ids);
   _.each(ids, function(id) {
     this._idsToFetch[id] = true;
   }.bind(this));
   yield needDispatch();
-  console.log('gen after fetch: ', ids);
   var objs = {};
   _.each(ids, function(id) {
     var key = this.cacheKey(id);
@@ -122,7 +117,6 @@ function Result(value) {
 }
 
 function needDispatch() {
-  console.log('needDispatch');
   var gen = Dispatcher.current();
   Dispatcher.wait(gen, null);
 }
@@ -268,11 +262,9 @@ CallGraph.prototype.getRunnableIds = function() {
       runnableIds.push(genId);
     }
   }.bind(this));
-  console.log('runnableIds:', runnableIds);
   return runnableIds;
 };
 CallGraph.prototype.getSendValue = function(gen) {
-  console.log('getSendValue:', gen);
   var genId = this.id(gen);
   var node = this._nodes[genId];
   var waitIds = node.waitIds();
@@ -304,7 +296,6 @@ Dispatcher.runOneStep = function(gen, sendValue) {
     var id = this._graph.id(gen);
     throw new Error('gen failed to yield result: ' + gen);
   } else if (yielded.value instanceof Result) {
-    console.log('result: ', yielded.value.value);
     this._graph.setResult(gen, yielded.value.value);
   }
   this._current = oldCurrent;
@@ -329,9 +320,7 @@ Dispatcher.run = function(root) {
     this.dispatch();
     // next, run generators
     var runnable = this._graph.getRunnableIds();
-    console.log('runnable:', runnable);
     _.each(runnable, function(genId) {
-      console.log('genId:', genId);
       var gen = this._graph.gen(genId);
       var sendValue = this._graph.getSendValue(gen);
       this.runOneStep(gen, sendValue);
