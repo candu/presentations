@@ -131,18 +131,12 @@ function needDispatch() {
 
 function wait(waitGen) {
   var gen = Dispatcher.current();
-  var id = Dispatcher._graph.id(gen);
-  var waitId = Dispatcher._graph.id(waitGen);
-  console.log('wait: ' + id + ' -> ' + waitId);
   Dispatcher.wait(gen, waitGen);
 }
 
-function waitv(/* waitGen1, ..., waitGenN */) {
+function waitv(/* waitGen, ... */) {
   var gen = Dispatcher.current();
   var waitGens = Array.prototype.slice.call(arguments);
-  var id = Dispatcher._graph.id(gen);
-  var waitIds = Dispatcher._graph.id(waitGens);
-  console.log('wait: ' + id + ' -> ' + JSON.stringify(waitIds));
   Dispatcher.wait(gen, waitGens);
 }
 
