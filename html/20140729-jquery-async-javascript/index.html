@@ -496,15 +496,15 @@ GenPromise.prototype._createGenerator = function*() {
 GenPromise.prototype.gen = function() {
   return this._g;
 };
-function gen(url) {
+function genPromise(url) {
   return new GenPromise($.getJSON(url)).gen();
 }
       </script>
       <script id="js_generators_from_promises">
   var genABCSeries = function*() {
-    var a = yield* gen('json/a.json');
-    var b = yield* gen('json/b.json');
-    var c = yield* gen('json/c.json');
+    var a = yield* genPromise('json/a.json');
+    var b = yield* genPromise('json/b.json');
+    var c = yield* genPromise('json/c.json');
     yield [a, b, c];
   };
   $('#btn_generators_from_promises').click(function() {
