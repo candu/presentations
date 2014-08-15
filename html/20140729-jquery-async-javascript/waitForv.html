@@ -8,9 +8,7 @@
 <script>
 
 var DB = {
-  _nextId: 3,
-  1: {name: 'foo'},
-  2: {name: 'bar'}
+  _nextId: 1
 };
 
 function query(ids) {
@@ -140,21 +138,34 @@ function waitv(/* waitGen, ... */) {
   Dispatcher.wait(gen, waitGens);
 }
 
+function waitva(waitGens) {
+  var gen = Dispatcher.current();
+  Dispatcher.wait(gen, waitGens);
+};
+
 function result(value) {
   return new Result(value);
 }
 
+function* initDB() {
+  var userIds = yield waitv(
+      ObjMutator.create('foo'),
+      ObjMutator.create('bar'));
+  yield result(userIds);
+}
+
 function* App() {
-  var user = yield wait(DT('Obj').gen(1));
+  var userIds = yield wait(initDB());
+  var user = yield wait(DT('Obj').gen(userIds[0]));
   console.log('user: ', user);
-  var users = yield waitv(
-    DT('Obj').gen(1),
-    DT('Obj').gen(2));
+  var users = yield waitva(_.map(userIds, function(userId) {
+    return DT('Obj').gen(userId);
+  }));
   console.log('users: ', users);
   yield wait(ObjMutator.setName(1, 'baz'));
-  users = yield waitv(
-    DT('Obj').gen(1),
-    DT('Obj').gen(2));
+  users = yield waitva(_.map(userIds, function(userId) {
+    return DT('Obj').gen(userId);
+  }));
   console.log('users: ', users);
   var userId = yield wait(ObjMutator.create('frob'));
   user = yield wait(DT('Obj').gen(userId));
