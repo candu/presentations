@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <script src="../../js/jquery-2.1.1.js"></script>
-  <script src="../../js/underscore-1.6.0.js"></script>
   <script src="js/g.js"></script>
 </head>
 <body>
@@ -14,10 +12,10 @@ var DB = {
 
 function query(ids) {
   var result = {};
-  _.each(ids, function fetchById(id) {
+  ids.forEach(function fetchById(id) {
     result[id] = null;
-    if (_.has(DB, id)) {
-      result[id] = _.clone(DB[id]);
+    if (id in DB) {
+      result[id] = DB[id];
     }
   });
   return result;
@@ -25,12 +23,12 @@ function query(ids) {
 
 function insert(name) {
   var id = DB._nextId++;
-  DB[id] = {name: name};
+  DB[id] = {id: id, name: name};
   return id;
 }
 
 function update(id, name) {
-  if (!_.has(DB, id)) {
+  if (!(id in DB)) {
     throw new Error('missing id: ' + id);
   }
   DB[id].name = name;
@@ -39,7 +37,7 @@ function update(id, name) {
 var DT = (function() {
   var _instances = {};
   var _DT = function(name) {
-    if (!_.has(_instances, name)) {
+    if (!(name in _instances)) {
       throw new Error('no DT instance: ' + name);
     }
     return _instances[name];
@@ -48,7 +46,9 @@ var DT = (function() {
     _instances[name] = instance;
   };
   _DT.dispatch = function() {
-    _.each(_instances, function(instance, name) {
+    var instanceNames = Object.keys(_instances);
+    instanceNames.forEach(function(name) {
+      var instance = _instances[name];
       instance.dispatch();
     });
   };
@@ -60,16 +60,16 @@ function AbstractDataType() {
   this._idsToFetch = {};
 }
 AbstractDataType.prototype.dispatch = function() {
-  var ids = _.filter(_.keys(this._idsToFetch), function(id) {
+  var ids = Object.keys(this._idsToFetch).filter(function(id) {
     var key = this.cacheKey(id);
-    return !_.has(this._cache, key);
+    return !(key in this._cache);
   }.bind(this));
   this._idsToFetch = {};
-  if (_.isEmpty(ids)) {
+  if (ids.length === 0) {
     return;
   }
   var values = this.fetch(ids);
-  _.each(ids, function(id) {
+  ids.forEach(function(id) {
     var key = this.cacheKey(id);
     this._cache[key] = values[id];
   }.bind(this));
@@ -78,16 +78,16 @@ AbstractDataType.prototype.gen = function*(ids) {
   if (!(ids instanceof Array)) {
     ids = [ids];
   }
-  _.each(ids, function(id) {
+  ids.forEach(function(id) {
     this._idsToFetch[id] = true;
   }.bind(this));
-  yield needDispatch();
+  yield g.wait();
   var objs = {};
-  _.each(ids, function(id) {
+  ids.forEach(function(id) {
     var key = this.cacheKey(id);
     objs[id] = this._cache[key];
   }.bind(this));
-  yield result(objs);
+  yield g.result(objs);
 };
 AbstractDataType.prototype.dirty = function(id) {
   var key = this.cacheKey(id);
@@ -105,41 +105,42 @@ DT.register('Obj', ObjDataType);
 
 var ObjMutator = {};
 ObjMutator.create = function*(name) {
-  yield result(insert(name));
+  yield g.result(insert(name));
 };
 ObjMutator.setName = function*(id, name) {
   update(id, name);
   DT('Obj').dirty(id);
-  yield result(null);
+  yield g.result(null);
 };
 
 function* initDB() {
-  var userIds = yield waitv(
+  var userIds = yield g.waitAll(
       ObjMutator.create('foo'),
       ObjMutator.create('bar'));
-  yield result(userIds);
+  yield g.result(userIds);
 }
 
 function* App() {
-  var userIds = yield wait(initDB());
-  var user = yield wait(DT('Obj').gen(userIds[0]));
+  var userIds = yield g.wait(initDB());
+  var user = yield g.wait(DT('Obj').gen(userIds[0]));
   console.log('user: ', user);
-  var users = yield waitva(_.map(userIds, function(userId) {
+  var users = yield g.waitAll(userIds.map(function(userId) {
     return DT('Obj').gen(userId);
   }));
   console.log('users: ', users);
-  yield wait(ObjMutator.setName(1, 'baz'));
-  users = yield waitva(_.map(userIds, function(userId) {
+  yield g.wait(ObjMutator.setName(1, 'baz'));
+  users = yield g.waitAll(userIds.map(function(userId) {
     return DT('Obj').gen(userId);
   }));
   console.log('users: ', users);
-  var userId = yield wait(ObjMutator.create('frob'));
-  user = yield wait(DT('Obj').gen(userId));
+  var userId = yield g.wait(ObjMutator.create('frob'));
+  user = yield g.wait(DT('Obj').gen(userId));
   console.log('user: ', user);
-  yield result('w00t');
+  yield g.result('w00t');
 }
 
-var result = Dispatcher.run(App());
+g.onDispatch(DT.dispatch);
+var result = g.run(App());
 console.log(result);
 
 </script>
