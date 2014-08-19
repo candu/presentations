@@ -398,17 +398,17 @@
       <div class="title">DIY promises, part 1</div>
       <pre><code data-code-target="#js_promises"></code></pre>
       <script id="js_promises">
-  var Promise = function() {
+  var DiyPromise = function() {
     this._callbacks = [];
     this._done = false;
   };
-  Promise.prototype.resolve = function(value) {
+  DiyPromise.prototype.resolve = function(value) {
     this._done = true;
     this._value = value;
     _.each(this._callbacks, function(callback) {
       callback(value); });
     return this; };
-  Promise.prototype.done = function(callback) {
+  DiyPromise.prototype.then = function(callback) {
     if (this._done) return callback(this._value);
     this._callbacks.push(callback);
     return this; };
@@ -420,22 +420,22 @@
       <button id="btn_promises_action">run it!</button>
       <script id="js_promises_action">
   function getJsonDiyPromise(url) {
-    var p = new Promise();
+    var p = new DiyPromise();
     $.getJSON(url, p.resolve.bind(p));
     return p;
   };
   $('#btn_promises_action').click(function() {
-    getJsonDiyPromise('json/a.json').done(alertJSON);
+    getJsonDiyPromise('json/a.json').then(alertJSON);
   });
       </script>
     </section>
     <section class="center">
-      <div class="title">Promise.all()</div>
+      <div class="title">DiyPromise.all()</div>
       <pre><code data-code-target="#js_promises_all"></code></pre>
       <button id="btn_promises_all">run it!</button>
       <script id="js_promises_all">
-  Promise.all = function(ps) {
-    var P = new Promise();
+  DiyPromise.all = function(ps) {
+    var P = new DiyPromise();
     if (ps.length === 0) { P.resolve([]); }
     var numDone = 0, n = ps.length, results = new Array(n);
     _.each(ps, function(p, i) {
@@ -445,7 +445,7 @@
     return P; };
   $('#btn_promises_all').click(function() {
     var ps = _.map(urls, getJsonDiyPromise);
-    Promise.all(ps).done(alertJSON); });
+    DiyPromise.all(ps).done(alertJSON); });
       </script>
     </section>
     <section class="chapter center">
@@ -538,8 +538,20 @@
     <section class="center">
       <div class="title">interfacing with promises, part 1</div>
       <pre><code data-code-target="#js_gen_promises"></code></pre>
-      <button id="btn_gen_promises">run it!</button>
       <script id="js_gen_promises">
+  var GenPromise = function(p) {
+    var g = (function*() { return yield(null); })();
+    p.done(g.next.bind(g));
+    return g;
+  };
+  function genPromise(url) {
+    return GenPromise($.getJSON(url));
+  }
+  function runGen(gen) {
+    var next = gen.next();
+    while (!next.done) { next = gen.next(); }
+    return next.value;
+  }
       </script>
     </section>
     <section class="center">
@@ -547,17 +559,30 @@
       <pre><code data-code-target="#js_gen_promises_action"></code></pre>
       <button id="btn_gen_promises_action">run it!</button>
       <script id="js_gen_promises_action">
+  function* genABC() {
+    var a = yield* genPromise('json/a.json');
+    var b = yield* genPromise('json/b.json');
+    var c = yield* genPromise('json/c.json');
+    return [a, b, c];
+  }
   $('#btn_gen_promises_action').click(function() {
+    alertJSON(runGen(genABC()));
   });
       </script>
     </section>
     <section class="center">
       <div class="title">spawn(), part 1</div>
       <pre><code data-code-target="#js_gen_spawn"></code></pre>
-      <button id="btn_gen_spawn">run it!</button>
       <script id="js_gen_spawn">
-  $('#btn_gen_spawn').click(function() {
-  });
+  function spawn(generatorFunc) {
+    function continuer(arg) {
+      var result = generator.next(arg);
+      if (result.done) return result.value;
+      else return Promise.resolve(result.value).then(continuer);
+    }
+    var generator = generatorFunc();
+    return continuer();
+  }
       </script>
     </section>
     <section class="center">
@@ -566,6 +591,12 @@
       <button id="btn_gen_spawn_action">run it!</button>
       <script id="js_gen_spawn_action">
   $('#btn_gen_spawn_action').click(function() {
+    spawn(function*() {
+      var a = yield $.getJSON('json/a.json');
+      var b = yield $.getJSON('json/b.json');
+      var c = yield $.getJSON('json/c.json');
+      return [a, b, c];
+    }).then(alertJSON);
   });
       </script>
     </section>
