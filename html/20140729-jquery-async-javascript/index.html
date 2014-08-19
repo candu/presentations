@@ -605,7 +605,14 @@
       <pre><code data-code-target="#js_gg"></code></pre>
       <button id="btn_gg">run it!</button>
       <script id="js_gg">
+  function* genJSON(url) {
+    return (yield gg.wait($.getJSON(url)));
+  }
+  function* genABC() {
+    return (yield gg.waitAll(_.map(urls, genJSON)));
+  }
   $('#btn_gg').click(function() {
+    gg.run(genABC(), function(err, result) { alertJSON(result); });
   });
       </script>
     </section>
