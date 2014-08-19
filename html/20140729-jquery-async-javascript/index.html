@@ -536,65 +536,45 @@
       </script>
     </section>
     <section class="center">
-      <div class="title">generators from promises</div>
-      <pre><code data-code-target="#js_generators_from_promises"></code></pre>
-      <button id="btn_generators_from_promises">run it!</button>
-      <script>
-var GenPromise = function(p) {
-  this._p = p;
-  this._g = this._createGenerator();
-  this._p.done(function(result) {
-    this._g.next(result);
-  }.bind(this));
-};
-GenPromise.prototype._createGenerator = function*() {
-  var result = yield null;
-  yield result;
-};
-GenPromise.prototype.gen = function() {
-  return this._g;
-};
-function genPromise(url) {
-  return new GenPromise($.getJSON(url)).gen();
-}
+      <div class="title">interfacing with promises, part 1</div>
+      <pre><code data-code-target="#js_gen_promises"></code></pre>
+      <button id="btn_gen_promises">run it!</button>
+      <script id="js_gen_promises">
       </script>
-      <script id="js_generators_from_promises">
-  var genABCSeries = function*() {
-    var a = yield* genPromise('json/a.json');
-    var b = yield* genPromise('json/b.json');
-    var c = yield* genPromise('json/c.json');
-    yield [a, b, c];
-  };
-  $('#btn_generators_from_promises').click(function() {
-    var abc = genABCSeries().next().value;
-    alertJSON(abc);
+    </section>
+    <section class="center">
+      <div class="title">interfacing with promises, part 2</div>
+      <pre><code data-code-target="#js_gen_promises_action"></code></pre>
+      <button id="btn_gen_promises_action">run it!</button>
+      <script id="js_gen_promises_action">
+  $('#btn_gen_promises_action').click(function() {
   });
       </script>
     </section>
     <section class="center">
-      <div class="title">genAll()</div>
-      <pre><code data-code-target="#js_gen_all"></code></pre>
-      <button id="btn_gen_all">run it!</button>
-      <script id="js_gen_all">
-  function genAll(gens) {
-  }
-  $('#btn_gen_all').click(function*() {
-    var results = yield genAll(_.map(urls, gen));
-    alertJSON(results);
+      <div class="title">spawn(), part 1</div>
+      <pre><code data-code-target="#js_gen_spawn"></code></pre>
+      <button id="btn_gen_spawn">run it!</button>
+      <script id="js_gen_spawn">
+  $('#btn_gen_spawn').click(function() {
   });
       </script>
     </section>
     <section class="center">
-      <div class="title">generators from callbacks</div>
-      <pre><code data-code-target="#js_generators_from_callbacks"></code></pre>
-      <button id="btn_generators_from_callbacks">run it!</button>
-      <script id="js_generators_from_callbacks">
-  function genCallback(fn) {
-    // TODO: this
-  }
-  $('#btn_generators_from_callbacks').click(function*() {
-    var a = yield genCallback(task('json/a.json'));
-    alertJSON(a);
+      <div class="title">spawn(), part 2</div>
+      <pre><code data-code-target="#js_gen_spawn_action"></code></pre>
+      <button id="btn_gen_spawn_action">run it!</button>
+      <script id="js_gen_spawn_action">
+  $('#btn_gen_spawn_action').click(function() {
+  });
+      </script>
+    </section>
+    <section class="center">
+      <div class="title"><a target="_blank" href="https://github.com/candu/gg">gg</a></div>
+      <pre><code data-code-target="#js_gg"></code></pre>
+      <button id="btn_gg">run it!</button>
+      <script id="js_gg">
+  $('#btn_gg').click(function() {
   });
       </script>
     </section>
