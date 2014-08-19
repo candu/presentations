@@ -201,6 +201,44 @@
       </script>
     </section>
     <section class="chapter center">
+      <h1>it's all in the timing</h1>
+    </section>
+    <section class="center">
+      <div class="title">WatchdogTimer</div>
+      <pre><code data-code-target="#js_watchdog_timer"></code></pre>
+      <button id="btn_watchdog_timer">run it!</button>
+      <script id="js_watchdog_timer">
+  var WatchdogTimer = function(delay) { this._delay = delay; };
+  WatchdogTimer.prototype.kick = function() {
+    if (this._timeout) window.clearTimeout(this._timeout);
+    this._timeout = window.setTimeout(function() { alert('bam!'); },
+      this._delay); };
+  var watchdog = null;
+  $('#btn_watchdog_timer').click(function() {
+    if (watchdog === null) watchdog = new WatchdogTimer(1000);
+    else watchdog.kick();
+  });
+      </script>
+    </section>
+    <section class="center">
+      <div class="title">requestAnimationFrame()</div>
+      <pre><code data-code-target="#js_animation_loop"></code></pre>
+      <button id="btn_animation_loop">run it!</button>
+      <div id="output_animation_loop">fps: 0</div>
+      <script id="js_animation_loop">
+  $('#btn_animation_loop').click(function() {
+    var fps = 0, last = new Date() - 1000, f = 0.1;
+    function render() {
+      var now = new Date(); var dt = now - last; last = now;
+      fps = (1 - f) * fps + f * 1000 / dt;
+      $('#output_animation_loop').text('fps: ' + Math.round(fps)); }
+    (function loop() {
+      window.requestAnimationFrame(loop);
+      render(); })();
+  });
+      </script>
+    </section>
+    <section class="chapter center">
       <h1>i'll have my people call your people</h1>
     </section>
     <section class="center">
