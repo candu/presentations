@@ -104,6 +104,24 @@
       </script>
     </section>
     <section class="center">
+      <div class="title"><a target="_blank" href="https://github.com/YuzuJS/setImmediate">setImmediate()</a></div>
+      <pre><code data-code-target="#js_set_immediate"></code></pre>
+      <button id="btn_set_immediate">run it!</button>
+      <script id="js_set_immediate">
+  $('#btn_set_immediate').click(function() {
+    var start = new Date(), numCalls = 0;
+    function callback() {
+      if (new Date() - start >= 1000) {
+        return alert('numCalls: ' + numCalls);
+      }
+      numCalls++;
+      window.setImmediate(callback);
+    }
+    window.setImmediate(callback);
+  });
+      </script>
+    </section>
+    <section class="center">
       <div class="title">events wait their turn</div>
       <pre><code data-code-target="#js_timeout_waiting"></code></pre>
       <button id="btn_timeout_waiting">run it!</button>
