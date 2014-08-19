@@ -439,13 +439,13 @@
     if (ps.length === 0) { P.resolve([]); }
     var numDone = 0, n = ps.length, results = new Array(n);
     _.each(ps, function(p, i) {
-      p.done(function(result) {
+      p.then(function(result) {
         results[i] = result;
         if (++numDone === n) P.resolve(results); }); });
     return P; };
   $('#btn_promises_all').click(function() {
     var ps = _.map(urls, getJsonDiyPromise);
-    DiyPromise.all(ps).done(alertJSON); });
+    DiyPromise.all(ps).then(alertJSON); });
       </script>
     </section>
     <section class="chapter center">
@@ -559,14 +559,14 @@
       <pre><code data-code-target="#js_gen_promises_action"></code></pre>
       <button id="btn_gen_promises_action">run it!</button>
       <script id="js_gen_promises_action">
-  function* genABC() {
+  function* genABCPromises() {
     var a = yield* genPromise('json/a.json');
     var b = yield* genPromise('json/b.json');
     var c = yield* genPromise('json/c.json');
     return [a, b, c];
   }
   $('#btn_gen_promises_action').click(function() {
-    alertJSON(runGen(genABC()));
+    alertJSON(runGen(genABCPromises()));
   });
       </script>
     </section>
@@ -621,12 +621,7 @@
       <h2><a target="_blank" href="https://facebook.github.io/regenerator/">sort of</a></h2>
     </section>
     <section class="chapter center">
-      <h1>further reading</h1>
-    </section>
-    <section>
-      <ul>
-        <li>TODO: this</li>
-      </ul>
+      <h1>fin</h1>
     </section>
     <section class="center">
       <h1>Async JavaScript</h1>
