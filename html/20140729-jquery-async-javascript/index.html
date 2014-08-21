@@ -639,16 +639,38 @@
     </section>
     <section class="center">
       <div class="title"><a target="_blank" href="https://github.com/candu/gg">gg</a></div>
-      <pre><code data-code-target="#js_gg"></code></pre>
-      <button id="btn_gg">run it!</button>
-      <script id="js_gg">
+      <p>
+        <img src="img/gg_github.png" />
+      </p>
+    </section>
+    <section class="center">
+      <div class="title">gg.run()</div>
+      <pre><code data-code-target="#js_gg_run"></code></pre>
+      <button id="btn_gg_run">run it!</button>
+      <script id="js_gg_run">
+  function* genCountdown() {
+    yield 3;
+    yield 2;
+    yield 1;
+    return 'liftoff!';
+  }
+  $('#btn_gg_run').click(function() {
+    gg.run(genCountdown(), function(err, result) { alertJSON(result); });
+  });
+      </script>
+    </section>
+    <section class="center">
+      <div class="title">gg.wait()</div>
+      <pre><code data-code-target="#js_gg_wait"></code></pre>
+      <button id="btn_gg_wait">run it!</button>
+      <script id="js_gg_wait">
   function* genJSON(url) {
     return (yield gg.wait($.getJSON(url)));
   }
   function* genABC() {
     return (yield gg.waitAll(_.map(urls, genJSON)));
   }
-  $('#btn_gg').click(function() {
+  $('#btn_gg_wait').click(function() {
     gg.run(genABC(), function(err, result) { alertJSON(result); });
   });
       </script>
