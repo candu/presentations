@@ -213,61 +213,6 @@
       </script>
     </section>
     <section class="chapter center">
-      <h1>it's all in the timing</h1>
-    </section>
-    <section class="center">
-      <div class="title">WatchdogTimer</div>
-      <pre><code data-code-target="#js_watchdog_timer"></code></pre>
-      <button id="btn_watchdog_timer">run it!</button>
-      <script id="js_watchdog_timer">
-  var WatchdogTimer = function(delay) { this._delay = delay; };
-  WatchdogTimer.prototype.kick = function() {
-    if (this._timeout) window.clearTimeout(this._timeout);
-    this._timeout = window.setTimeout(function() { alert('bam!'); },
-      this._delay); };
-  var watchdog = new WatchdogTimer(1000);
-  $('#btn_watchdog_timer').click(function() {
-    watchdog.kick();
-  });
-      </script>
-    </section>
-    <section class="center">
-      <div class="title">animation loops</div>
-      <pre><code data-code-target="#js_anim_loop"></code></pre>
-      <button id="btn_anim_loop">run it!</button>
-      <div id="output_anim_loop">fps: 0</div>
-      <script id="js_anim_loop">
-  $('#btn_anim_loop').click(function() {
-    var fps = 0, last = new Date() - 1000, f = 0.1;
-    function render() {
-      var now = new Date(); var dt = now - last; last = now;
-      fps = (1 - f) * fps + f * 1000 / dt;
-      $('#output_anim_loop').text('fps: ' + Math.round(fps)); }
-    (function loop() {
-      render();
-      window.setTimeout(loop, Math.max(0, 16 - (new Date() - last))); })();
-  });
-      </script>
-    </section>
-    <section class="center">
-      <div class="title">requestAnimationFrame()</div>
-      <pre><code data-code-target="#js_raf_loop"></code></pre>
-      <button id="btn_raf_loop">run it!</button>
-      <div id="output_raf_loop">fps: 0</div>
-      <script id="js_raf_loop">
-  $('#btn_raf_loop').click(function() {
-    var fps = 0, last = new Date() - 1000, f = 0.1;
-    function render() {
-      var now = new Date(); var dt = now - last; last = now;
-      fps = (1 - f) * fps + f * 1000 / dt;
-      $('#output_raf_loop').text('fps: ' + Math.round(fps)); }
-    (function loop() {
-      window.requestAnimationFrame(loop);
-      render(); })();
-  });
-      </script>
-    </section>
-    <section class="chapter center">
       <h1>i'll have my people call your people</h1>
     </section>
     <section class="center">
@@ -680,6 +625,61 @@
     <section class="center">
       <div class="title">DIY generators?</div>
       <h2><a target="_blank" href="https://facebook.github.io/regenerator/">sort of</a></h2>
+    </section>
+    <section class="chapter center">
+      <h1>it's all in the timing</h1>
+    </section>
+    <section class="center">
+      <div class="title">WatchdogTimer</div>
+      <pre><code data-code-target="#js_watchdog_timer"></code></pre>
+      <button id="btn_watchdog_timer">run it!</button>
+      <script id="js_watchdog_timer">
+  var WatchdogTimer = function(delay) { this._delay = delay; };
+  WatchdogTimer.prototype.kick = function() {
+    if (this._timeout) window.clearTimeout(this._timeout);
+    this._timeout = window.setTimeout(function() { alert('bam!'); },
+      this._delay); };
+  var watchdog = new WatchdogTimer(1000);
+  $('#btn_watchdog_timer').click(function() {
+    watchdog.kick();
+  });
+      </script>
+    </section>
+    <section class="center">
+      <div class="title">animation loops</div>
+      <pre><code data-code-target="#js_anim_loop"></code></pre>
+      <button id="btn_anim_loop">run it!</button>
+      <div id="output_anim_loop">fps: 0</div>
+      <script id="js_anim_loop">
+  $('#btn_anim_loop').click(function() {
+    var fps = 0, last = new Date() - 1000, f = 0.1;
+    function render() {
+      var now = new Date(); var dt = now - last; last = now;
+      fps = (1 - f) * fps + f * 1000 / dt;
+      $('#output_anim_loop').text('fps: ' + Math.round(fps)); }
+    (function loop() {
+      render();
+      window.setTimeout(loop, Math.max(0, 16 - (new Date() - last))); })();
+  });
+      </script>
+    </section>
+    <section class="center">
+      <div class="title">requestAnimationFrame()</div>
+      <pre><code data-code-target="#js_raf_loop"></code></pre>
+      <button id="btn_raf_loop">run it!</button>
+      <div id="output_raf_loop">fps: 0</div>
+      <script id="js_raf_loop">
+  $('#btn_raf_loop').click(function() {
+    var fps = 0, last = new Date() - 1000, f = 0.1;
+    function render() {
+      var now = new Date(); var dt = now - last; last = now;
+      fps = (1 - f) * fps + f * 1000 / dt;
+      $('#output_raf_loop').text('fps: ' + Math.round(fps)); }
+    (function loop() {
+      window.requestAnimationFrame(loop);
+      render(); })();
+  });
+      </script>
     </section>
     <section class="chapter center">
       <h1>fin</h1>
