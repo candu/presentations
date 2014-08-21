@@ -126,6 +126,23 @@
     <section class="chapter center">
       <h1>i said right this second!</h1>
     </section>
+    <section class="center">
+      <div class="title">timer resolution is ~4 ms</div>
+      <pre><code data-code-target="#js_timer_resolution"></code></pre>
+      <button id="btn_timer_resolution">run it!</button>
+      <script id="js_timer_resolution">
+  $('#btn_timer_resolution').click(function() {
+    var start = new Date(), numCalls = 0;
+    (function callbackTimeout() {
+      if (new Date() - start >= 1000) {
+        return alert('numCalls: ' + numCalls);
+      }
+      numCalls++;
+      window.setTimeout(callbackTimeout, 0);
+    })();
+  });
+      </script>
+    </section>
     <section>
       <blockquote>
         The minimum delay, DOM_MIN_TIMEOUT_VALUE, is 4 ms...the timeout can also fire later
@@ -136,39 +153,27 @@
       </blockquote>
     </section>
     <section class="center">
-      <div class="title">timer resolution is ~4 ms</div>
-      <pre><code data-code-target="#js_timer_resolution"></code></pre>
-      <button id="btn_timer_resolution">run it!</button>
-      <script id="js_timer_resolution">
-  $('#btn_timer_resolution').click(function() {
-    var start = new Date(), numCalls = 0;
-    var interval = window.setInterval(function() {
-      if (new Date() - start >= 1000) {
-        window.clearInterval(interval);
-        alert('numCalls: ' + numCalls);
-      }
-      numCalls++;
-    }, 0);
-  });
-      </script>
-    </section>
-    <section class="center">
       <div class="title"><a target="_blank" href="https://github.com/YuzuJS/setImmediate">setImmediate()</a></div>
       <pre><code data-code-target="#js_set_immediate"></code></pre>
       <button id="btn_set_immediate">run it!</button>
       <script id="js_set_immediate">
   $('#btn_set_immediate').click(function() {
     var start = new Date(), numCalls = 0;
-    function callback() {
+    (function callbackImmediate() {
       if (new Date() - start >= 1000) {
         return alert('numCalls: ' + numCalls);
       }
       numCalls++;
-      window.setImmediate(callback);
-    }
-    window.setImmediate(callback);
+      window.setImmediate(callbackImmediate);
+    })();
   });
       </script>
+    </section>
+    <section class="center">
+      <div class="title">setImmediate?</div>
+      <p>
+        <img src="img/mdn_set_immediate_compat.png" />
+      </p>
     </section>
     <section class="center">
       <div class="title">the postMessage() trick, part 1</div>
@@ -227,17 +232,35 @@
       </script>
     </section>
     <section class="center">
-      <div class="title">requestAnimationFrame()</div>
-      <pre><code data-code-target="#js_animation_loop"></code></pre>
-      <button id="btn_animation_loop">run it!</button>
-      <div id="output_animation_loop">fps: 0</div>
-      <script id="js_animation_loop">
-  $('#btn_animation_loop').click(function() {
+      <div class="title">animation loops</div>
+      <pre><code data-code-target="#js_anim_loop"></code></pre>
+      <button id="btn_anim_loop">run it!</button>
+      <div id="output_anim_loop">fps: 0</div>
+      <script id="js_anim_loop">
+  $('#btn_anim_loop').click(function() {
     var fps = 0, last = new Date() - 1000, f = 0.1;
     function render() {
       var now = new Date(); var dt = now - last; last = now;
       fps = (1 - f) * fps + f * 1000 / dt;
-      $('#output_animation_loop').text('fps: ' + Math.round(fps)); }
+      $('#output_anim_loop').text('fps: ' + Math.round(fps)); }
+    (function loop() {
+      render();
+      window.setTimeout(loop, Math.max(0, 16 - (new Date() - last))); })();
+  });
+      </script>
+    </section>
+    <section class="center">
+      <div class="title">requestAnimationFrame()</div>
+      <pre><code data-code-target="#js_raf_loop"></code></pre>
+      <button id="btn_raf_loop">run it!</button>
+      <div id="output_raf_loop">fps: 0</div>
+      <script id="js_raf_loop">
+  $('#btn_raf_loop').click(function() {
+    var fps = 0, last = new Date() - 1000, f = 0.1;
+    function render() {
+      var now = new Date(); var dt = now - last; last = now;
+      fps = (1 - f) * fps + f * 1000 / dt;
+      $('#output_raf_loop').text('fps: ' + Math.round(fps)); }
     (function loop() {
       window.requestAnimationFrame(loop);
       render(); })();
