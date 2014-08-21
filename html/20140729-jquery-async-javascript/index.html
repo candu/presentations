@@ -404,7 +404,7 @@
    * });
    */
   $('#btn_ajax_new_style').click(function() {
-    $.getJSON('json/a.json').done(alertJSON);
+    $.getJSON('json/a.json').then(alertJSON);
   });
       </script>
     </section>
@@ -419,7 +419,7 @@
     return d.promise();
   }
   $('#btn_deferreds').click(function() {
-    getJsonNew('json/a.json').done(alertJSON);
+    getJsonNew('json/a.json').then(alertJSON);
   });
       </script>
     </section>
@@ -588,7 +588,7 @@
       <script id="js_gen_promises">
   var GenPromise = function(p) {
     var g = (function*() { return yield(null); })();
-    p.done(g.next.bind(g));
+    p.then(g.next.bind(g));
     return g;
   };
   function genPromise(url) {
