@@ -351,25 +351,15 @@
       <h1>everything but the kitchen async</h1>
     </section>
     <section class="center">
-      <div class="title">node-style callbacks</div>
-      <pre><code data-code-target="#js_node_callbacks"></code></pre>
-      <button id="btn_node_callbacks">run it!</button>
-      <script id="js_node_callbacks">
+      <div class="title">async.series()</div>
+      <pre><code data-code-target="#js_series_async"></code></pre>
+      <button id="btn_series_async">run it!</button>
+      <script id="js_series_async">
   function task(url) {
     return function(callback) {
       $.getJSON(url, function(result) { callback(null, result); });
     };
   }
-  $('#btn_node_callbacks').click(function() {
-    task('json/a.json')(function(err, a) { alertJSON(a); });
-  });
-      </script>
-    </section>
-    <section class="center">
-      <div class="title">async.series()</div>
-      <pre><code data-code-target="#js_series_async"></code></pre>
-      <button id="btn_series_async">run it!</button>
-      <script id="js_series_async">
   $('#btn_series_async').click(function() {
     async.series(_.map(urls, task), function(err, abc) {
       alertJSON(abc);
@@ -386,6 +376,16 @@
     async.parallel(_.map(urls, task), function(err, abc) {
       alertJSON(abc);
     });
+  });
+      </script>
+    </section>
+    <section class="center">
+      <div class="title">node-style callbacks</div>
+      <pre><code data-code-target="#js_node_callbacks"></code></pre>
+      <button id="btn_node_callbacks">run it!</button>
+      <script id="js_node_callbacks">
+  $('#btn_node_callbacks').click(function() {
+    task('json/a.json')(function(err, a) { alertJSON(a); });
   });
       </script>
     </section>
