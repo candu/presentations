@@ -31,14 +31,22 @@
       </div>
     </section>
     <section class="chapter center">
-      <h1>before you start</h1>
+      <h1>before we start</h1>
     </section>
     <section class="center">
       <div class="title">Chrome users:<div>
       <h2><a target="_blank" href="https://plus.google.com/+PaulIrish/posts/T615Md5JPQG">enable Harmony!</a></h2>
-      <h3>go here, click "Enable", then restart:</h3>
+      <h3>go here, click "Enable", restart browser:</h3>
       <p>
       <small>chrome://flags/#enable-javascript-harmony</small>
+      </p>
+    </section>
+    <section class="center">
+      <div class="title">hey! listen!<div>
+      <h2><a target="_blank" href="https://candu.github.io/presentations/html/20140729-jquery-async-javascript/">these slides are HTML/JS</a></h2>
+      <h3>go here, click "Async JavaScript", enjoy!</h3>
+      <p>
+      <small>https://candu.github.io/presentations</small>
       </p>
     </section>
     <section class="chapter center">
@@ -56,6 +64,12 @@
     $('#btn_dom_waiting').css('background-color', '#ff0');
   });
       </script>
+    </section>
+    <section class="center">
+      <div class="title">welcome to JavaScript!</div>
+      <p>
+        <img src="img/js_event_loop.png" />
+      </p>
     </section>
     <section class="center">
       <div class="title">the setTimeout(..., 0) trick</div>
@@ -122,6 +136,12 @@
     })
   });
       </script>
+    </section>
+    <section class="center">
+      <div class="title">the event loop</div>
+      <p>
+        <img src="img/js_event_loop.png" />
+      </p>
     </section>
     <section class="chapter center">
       <h1>i said right this second!</h1>
@@ -296,6 +316,12 @@
       <h1>everything but the kitchen async</h1>
     </section>
     <section class="center">
+      <div class="title"><a target="_blank" href="https://github.com/caolan/async">async</a></div>
+      <p>
+        <img src="img/async_github.png" />
+      </p>
+    </section>
+    <section class="center">
       <div class="title">async.series()</div>
       <pre><code data-code-target="#js_series_async"></code></pre>
       <button id="btn_series_async">run it!</button>
@@ -414,6 +440,7 @@
   };
   $('#btn_promises_action').click(function() {
     getJsonDiyPromise('json/a.json').then(alertJSON);
+    // oops, we didn't implement chainable promises
   });
       </script>
     </section>
@@ -435,6 +462,10 @@
     var ps = _.map(urls, getJsonDiyPromise);
     DiyPromise.all(ps).then(alertJSON); });
       </script>
+    </section>
+    <section class="center">
+      <div class="title">for your promise needs:</div>
+      <h2><a target="_blank" href="https://github.com/kriskowal/q">use Q</a></h2>
     </section>
     <section class="chapter center">
       <h1>what's the big event?</h1>
@@ -542,7 +573,7 @@
       </script>
     </section>
     <section class="center">
-      <div class="title">interfacing with promises, part 1</div>
+      <div class="title">generators and promises, part 1</div>
       <pre><code data-code-target="#js_gen_promises"></code></pre>
       <script id="js_gen_promises">
   var GenPromise = function(p) {
@@ -561,7 +592,7 @@
       </script>
     </section>
     <section class="center">
-      <div class="title">interfacing with promises, part 2</div>
+      <div class="title">generators and promises, part 2</div>
       <pre><code data-code-target="#js_gen_promises_action"></code></pre>
       <button id="btn_gen_promises_action">run it!</button>
       <script id="js_gen_promises_action">
@@ -577,7 +608,7 @@
       </script>
     </section>
     <section class="center">
-      <div class="title">spawn(), part 1</div>
+      <div class="title">generators and promises, part 3</div>
       <pre><code data-code-target="#js_gen_spawn"></code></pre>
       <script id="js_gen_spawn">
   function spawn(generatorFunc) {
@@ -592,7 +623,7 @@
       </script>
     </section>
     <section class="center">
-      <div class="title">spawn(), part 2</div>
+      <div class="title">generators and promises, part 4</div>
       <pre><code data-code-target="#js_gen_spawn_action"></code></pre>
       <button id="btn_gen_spawn_action">run it!</button>
       <script id="js_gen_spawn_action">
