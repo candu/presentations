@@ -409,6 +409,20 @@
       </script>
     </section>
     <section class="center">
+      <div class="title">chaining promises</div>
+      <pre><code data-code-target="#js_promise_chaining"></code></pre>
+      <button id="btn_promise_chaining">run it!</button>
+      <script id="js_promise_chaining">
+  $('#btn_promise_chaining').click(function() {
+    var a, b, c;
+    $.getJSON('json/a.json')
+      .then(function(x) { a = x; return $.getJSON('json/b.json'); })
+      .then(function(x) { b = x; return $.getJSON('json/c.json'); })
+      .then(function(x) { c = x; alertJSON([a, b, c]); });
+  });
+      </script>
+    </section>
+    <section class="center">
       <div class="title">deferreds and promises</div>
       <pre><code data-code-target="#js_deferreds"></code></pre>
       <button id="btn_deferreds">run it!</button>
