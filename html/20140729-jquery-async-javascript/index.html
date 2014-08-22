@@ -137,94 +137,10 @@
   });
       </script>
     </section>
-    <section class="chapter center">
-      <h1>i said right this second!</h1>
-    </section>
     <section class="center">
-      <div class="title">timer resolution is ~4 ms</div>
-      <pre><code data-code-target="#js_timer_resolution"></code></pre>
-      <button id="btn_timer_resolution">run it!</button>
-      <script id="js_timer_resolution">
-  $('#btn_timer_resolution').click(function() {
-    var start = new Date(), numCalls = 0;
-    (function callbackTimeout() {
-      if (new Date() - start >= 1000) {
-        return alert('numCalls: ' + numCalls);
-      }
-      numCalls++;
-      window.setTimeout(callbackTimeout, 0);
-    })();
-  });
-      </script>
-    </section>
-    <section>
-      <blockquote>
-        The minimum delay, DOM_MIN_TIMEOUT_VALUE, is 4 ms...the timeout can also fire later
-        when the page (or the OS/browser itself) is busy with other tasks.
-        <footer>
-          &ndash; <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window.setTimeout">MDN - window.setTimeout</a>
-        </footer>
-      </blockquote>
-    </section>
-    <section class="center">
-      <div class="title"><a target="_blank" href="https://github.com/YuzuJS/setImmediate">setImmediate()</a></div>
-      <pre><code data-code-target="#js_set_immediate"></code></pre>
-      <button id="btn_set_immediate">run it!</button>
-      <script id="js_set_immediate">
-  $('#btn_set_immediate').click(function() {
-    var start = new Date(), numCalls = 0;
-    (function callbackImmediate() {
-      if (new Date() - start >= 1000) {
-        return alert('numCalls: ' + numCalls);
-      }
-      numCalls++;
-      window.setImmediate(callbackImmediate);
-    })();
-  });
-      </script>
-    </section>
-    <section class="center">
-      <div class="title">setImmediate?</div>
       <p>
-        <img src="img/mdn_set_immediate_compat.png" />
+        <img src="img/js_is_coming.jpg" />
       </p>
-    </section>
-    <section class="center">
-      <div class="title">the postMessage() trick, part 1</div>
-      <pre><code data-code-target="#js_post_message"></code></pre>
-      <script id="js_post_message">
-  (function() {
-    var callbacks = [];
-    window.addEventListener('message', function(event) {
-      if (event.source == window && event.data == '__zero_timeout__') {
-        event.stopPropagation();
-        if (callbacks.length > 0) (callbacks.shift())();
-      }
-    }, true);
-    window.setZeroTimeout = function(callback) {
-      callbacks.push(callback);
-      window.postMessage('__zero_timeout__', '*');
-    };
-  })();
-      </script>
-    </section>
-    <section class="center">
-      <div class="title">the postMessage() trick, part 2</div>
-      <pre><code data-code-target="#js_post_message_action"></code></pre>
-      <button id="btn_post_message_action">run it!</button>
-      <script id="js_post_message_action">
-  $('#btn_post_message_action').click(function() {
-    var start = new Date(), numCalls = 0;
-    function callback() {
-      if (new Date() - start >= 1000) {
-        return alert('numCalls: ' + numCalls);
-      }
-      numCalls++;
-      window.setZeroTimeout(callback);
-    }
-    window.setZeroTimeout(callback);
-  });
-      </script>
     </section>
     <section class="chapter center">
       <h1>i'll have my people call your people</h1>
@@ -660,6 +576,95 @@
       <div class="title">other generator resources</div>
       <h3><a target="_blank" href="https://github.com/visionmedia/co">co</a></h3>
       <h3><a target="_blank" href="https://facebook.github.io/regenerator/">regenerator</a></h3>
+    </section>
+    <section class="chapter center">
+      <h1>i said right this second!</h1>
+    </section>
+    <section class="center">
+      <div class="title">timer resolution is ~4 ms</div>
+      <pre><code data-code-target="#js_timer_resolution"></code></pre>
+      <button id="btn_timer_resolution">run it!</button>
+      <script id="js_timer_resolution">
+  $('#btn_timer_resolution').click(function() {
+    var start = new Date(), numCalls = 0;
+    (function callbackTimeout() {
+      if (new Date() - start >= 1000) {
+        return alert('numCalls: ' + numCalls);
+      }
+      numCalls++;
+      window.setTimeout(callbackTimeout, 0);
+    })();
+  });
+      </script>
+    </section>
+    <section>
+      <blockquote>
+        The minimum delay, DOM_MIN_TIMEOUT_VALUE, is 4 ms...the timeout can also fire later
+        when the page (or the OS/browser itself) is busy with other tasks.
+        <footer>
+          &ndash; <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window.setTimeout">MDN - window.setTimeout</a>
+        </footer>
+      </blockquote>
+    </section>
+    <section class="center">
+      <div class="title"><a target="_blank" href="https://github.com/YuzuJS/setImmediate">setImmediate()</a></div>
+      <pre><code data-code-target="#js_set_immediate"></code></pre>
+      <button id="btn_set_immediate">run it!</button>
+      <script id="js_set_immediate">
+  $('#btn_set_immediate').click(function() {
+    var start = new Date(), numCalls = 0;
+    (function callbackImmediate() {
+      if (new Date() - start >= 1000) {
+        return alert('numCalls: ' + numCalls);
+      }
+      numCalls++;
+      window.setImmediate(callbackImmediate);
+    })();
+  });
+      </script>
+    </section>
+    <section class="center">
+      <div class="title">setImmediate?</div>
+      <p>
+        <img src="img/mdn_set_immediate_compat.png" />
+      </p>
+    </section>
+    <section class="center">
+      <div class="title">the postMessage() trick, part 1</div>
+      <pre><code data-code-target="#js_post_message"></code></pre>
+      <script id="js_post_message">
+  (function() {
+    var callbacks = [];
+    window.addEventListener('message', function(event) {
+      if (event.source == window && event.data == '__zero_timeout__') {
+        event.stopPropagation();
+        if (callbacks.length > 0) (callbacks.shift())();
+      }
+    }, true);
+    window.setZeroTimeout = function(callback) {
+      callbacks.push(callback);
+      window.postMessage('__zero_timeout__', '*');
+    };
+  })();
+      </script>
+    </section>
+    <section class="center">
+      <div class="title">the postMessage() trick, part 2</div>
+      <pre><code data-code-target="#js_post_message_action"></code></pre>
+      <button id="btn_post_message_action">run it!</button>
+      <script id="js_post_message_action">
+  $('#btn_post_message_action').click(function() {
+    var start = new Date(), numCalls = 0;
+    function callback() {
+      if (new Date() - start >= 1000) {
+        return alert('numCalls: ' + numCalls);
+      }
+      numCalls++;
+      window.setZeroTimeout(callback);
+    }
+    window.setZeroTimeout(callback);
+  });
+      </script>
     </section>
     <section class="chapter center">
       <h1>it's all in the timing</h1>
