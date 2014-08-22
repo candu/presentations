@@ -137,12 +137,6 @@
   });
       </script>
     </section>
-    <section class="center">
-      <div class="title">the event loop</div>
-      <p>
-        <img src="img/js_event_loop.png" />
-      </p>
-    </section>
     <section class="chapter center">
       <h1>i said right this second!</h1>
     </section>
@@ -394,21 +388,6 @@
       </script>
     </section>
     <section class="center">
-      <div class="title">deferreds and promises</div>
-      <pre><code data-code-target="#js_deferreds"></code></pre>
-      <button id="btn_deferreds">run it!</button>
-      <script id="js_deferreds">
-  function getJsonNew(url) {
-    var d = new $.Deferred();
-    $.getJSON(url, d.resolve.bind(d));
-    return d.promise();
-  }
-  $('#btn_deferreds').click(function() {
-    getJsonNew('json/a.json').then(alertJSON);
-  });
-      </script>
-    </section>
-    <section class="center">
       <div class="title">DIY promises, part 1</div>
       <pre><code data-code-target="#js_promises"></code></pre>
       <script id="js_promises">
@@ -465,7 +444,9 @@
     </section>
     <section class="center">
       <div class="title">for your promise needs:</div>
-      <h2><a target="_blank" href="https://github.com/kriskowal/q">use Q</a></h2>
+      <h3><a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise API</a></h3>
+      <h3><a target="_blank" href="http://api.jquery.com/category/deferred-object/">$.Deferred()</a></h3>
+      <h3><a target="_blank" href="https://github.com/kriskowal/q">Q</a></h3>
     </section>
     <section class="chapter center">
       <h1>what's the big event?</h1>
@@ -676,8 +657,9 @@
       </script>
     </section>
     <section class="center">
-      <div class="title">DIY generators?</div>
-      <h2><a target="_blank" href="https://facebook.github.io/regenerator/">sort of</a></h2>
+      <div class="title">other generator resources</div>
+      <h3><a target="_blank" href="https://github.com/visionmedia/co">co</a></h3>
+      <h3><a target="_blank" href="https://facebook.github.io/regenerator/">regenerator</a></h3>
     </section>
     <section class="chapter center">
       <h1>it's all in the timing</h1>
