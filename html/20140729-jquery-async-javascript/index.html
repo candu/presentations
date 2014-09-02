@@ -58,10 +58,10 @@
       <button id="btn_dom_waiting">run it!</button>
       <script id="js_dom_waiting">
   $('#btn_dom_waiting').click(function() {
-    $('#btn_dom_waiting').css('background-color', '#f00');
+    $('#btn_dom_waiting').css('background-color', 'red');
     var start = new Date();
     while (new Date() - start < 1000) {}  // busy wait...
-    $('#btn_dom_waiting').css('background-color', '#ff0');
+    $('#btn_dom_waiting').css('background-color', 'yellow');
   });
       </script>
     </section>
@@ -77,11 +77,11 @@
       <button id="btn_dom_waiting_fixed">run it!</button>
       <script id="js_dom_waiting_fixed">
   $('#btn_dom_waiting_fixed').click(function() {
-    $('#btn_dom_waiting_fixed').css('background-color', '#f00');
+    $('#btn_dom_waiting_fixed').css('background-color', 'red');
     var start = new Date();
     window.setTimeout(function() {
       while (new Date() - start < 1000) {}  // busy wait...
-      $('#btn_dom_waiting_fixed').css('background-color', '#ff0');
+      $('#btn_dom_waiting_fixed').css('background-color', 'yellow');
     }, 0);
   });
       </script>
@@ -421,10 +421,10 @@
       <button id="btn_event_dom_waiting">run it!</button>
       <script id="js_event_dom_waiting">
   dispatcher.on('bar', function() {
-    $('#btn_event_dom_waiting').css('background-color', '#ff0');
+    $('#btn_event_dom_waiting').css('background-color', 'yellow');
   });
   $('#btn_event_dom_waiting').click(function() {
-    $('#btn_event_dom_waiting').css('background-color', '#f00');
+    $('#btn_event_dom_waiting').css('background-color', 'red');
     var start = new Date();
     while (new Date() - start < 1000) {}  // busy wait...
     dispatcher.trigger('bar');
@@ -682,6 +682,19 @@
   var watchdog = new WatchdogTimer(1000);
   $('#btn_watchdog_timer').click(function() {
     watchdog.kick();
+  });
+      </script>
+    </section>
+    <section class="center">
+      <div class="title">_.debounce</div>
+      <pre><code data-code-target="#js_debounce"></code></pre>
+      <button id="btn_debounce">run it!</button>
+      <script id="js_debounce">
+  var kick = _.debounce(function() {
+    alert('bam!');
+  }, 1000);
+  $('#btn_debounce').click(function() {
+    kick();
   });
       </script>
     </section>
