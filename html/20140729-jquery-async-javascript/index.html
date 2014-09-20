@@ -15,6 +15,7 @@
     <script src="../../js/underscore-1.6.0.js"></script>
     <script src="../../js/async.js"></script>
     <script src="js/setImmediate.js"></script>
+    <script src="js/co.js"></script>
     <script src="js/gg.js"></script>
   </head>
   <body>
@@ -53,14 +54,26 @@
       <h1>wait in line</h1>
     </section>
     <section class="center">
+      <div class="title">busyWait(), asyncWait()</div>
+      <pre><code data-code-target="#js_busy_wait"></code></pre>
+      <script id="js_busy_wait">
+  function busyWait(ms) {
+    var start = new Date();
+    while (new Date() - start < ms) {}  // busy wait...
+  }
+  function asyncWait(ms, fn) {
+    return window.setTimeout(fn, ms);
+  };
+      </script>
+    </section>
+    <section class="center">
       <div class="title">DOM updates wait their turn</div>
       <pre><code data-code-target="#js_dom_waiting"></code></pre>
       <button id="btn_dom_waiting">run it!</button>
       <script id="js_dom_waiting">
   $('#btn_dom_waiting').click(function() {
     $('#btn_dom_waiting').css('background-color', 'red');
-    var start = new Date();
-    while (new Date() - start < 1000) {}  // busy wait...
+    busyWait(1000);
     $('#btn_dom_waiting').css('background-color', 'yellow');
   });
       </script>
@@ -78,11 +91,10 @@
       <script id="js_dom_waiting_fixed">
   $('#btn_dom_waiting_fixed').click(function() {
     $('#btn_dom_waiting_fixed').css('background-color', 'red');
-    var start = new Date();
-    window.setTimeout(function() {
-      while (new Date() - start < 1000) {}  // busy wait...
+    asyncWait(0, function() {
+      busyWait(1000);
       $('#btn_dom_waiting_fixed').css('background-color', 'yellow');
-    }, 0);
+    });
   });
       </script>
     </section>
@@ -93,11 +105,11 @@
       <script id="js_timeout_waiting">
   $('#btn_timeout_waiting').click(function() {
     var start = new Date();
-    window.setTimeout(function() {
+    asyncWait(0, function() {
       var elapsed = new Date() - start;
       alert('elapsed: ' + elapsed + ' ms');
-    }, 0);
-    while (new Date() - start < 1000) {}  // busy wait...
+    });
+    busyWait(1000);
   });
       </script>
     </section>
@@ -110,11 +122,11 @@
   $('#btn_event_queue').click(function() {
     $('#output_event_queue').empty();
     _.each(_.range(10), function(i) {
-      window.setTimeout(function() {
-        var start = new Date(), wait = Math.floor(200 * Math.random());
-        while (new Date() - start < wait) {}  // busy wait...
+      asyncWait(0, function() {
+        var wait = Math.floor(200 * Math.random());
+        busyWait(wait);
         $('<span />').text(i).appendTo($('#output_event_queue'));
-      }, 0);
+      });
     })
   });
       </script>
@@ -129,10 +141,9 @@
     $('#output_event_queue_fixed').empty();
     _.each(_.range(10), function(i) {
       var wait = Math.floor(200 * Math.random());
-      window.setTimeout(function() {
-        var start = new Date();
+      asyncWait(wait, function() {
         $('<span />').text(i).appendTo($('#output_event_queue_fixed'));
-      }, wait);  // timeout wait...
+      });
     })
   });
       </script>
@@ -535,26 +546,31 @@
       </script>
     </section>
     <section class="center">
+      <div class="title"><a target="_blank" href="https://github.com/visionmedia/co">co</a></div>
+      <p>
+        <img src="img/co_github.png" />
+      </p>
+    </section>
+    <section class="center">
+      <div class="title">co()</div>
+      <pre><code data-code-target="#js_co"></code></pre>
+      <button id="btn_co">run it!</button>
+      <script id="js_co">
+  $('#btn_co').click(function() {
+    co(function *() {
+      var a = $.getJSON('json/a.json');
+      var b = $.getJSON('json/b.json');
+      var c = $.getJSON('json/c.json');
+      alertJSON(yield [a, b, c]);
+    })(); 
+  });
+      </script>
+    </section>
+    <section class="center">
       <div class="title"><a target="_blank" href="https://github.com/candu/gg">gg</a></div>
       <p>
         <img src="img/gg_github.png" />
       </p>
-    </section>
-    <section class="center">
-      <div class="title">gg.run()</div>
-      <pre><code data-code-target="#js_gg_run"></code></pre>
-      <button id="btn_gg_run">run it!</button>
-      <script id="js_gg_run">
-  function* genCountdown() {
-    yield 3;
-    yield 2;
-    yield 1;
-    return 'liftoff!';
-  }
-  $('#btn_gg_run').click(function() {
-    gg.run(genCountdown(), function(err, result) { alertJSON(result); });
-  });
-      </script>
     </section>
     <section class="center">
       <div class="title">gg.wait()</div>
@@ -573,9 +589,10 @@
       </script>
     </section>
     <section class="center">
-      <div class="title">other generator resources</div>
-      <h3><a target="_blank" href="https://github.com/visionmedia/co">co</a></h3>
+      <div class="title">DIY generators?</div>
       <h3><a target="_blank" href="https://facebook.github.io/regenerator/">regenerator</a></h3>
+      <h3><a target="_blank" href="https://github.com/google/traceur-compiler">Traceur</a></h3>
+      <p><small>TL;DR: sort of. <small>if you like byzantine code transformations. <small>and pain.</small></small></small></p>
     </section>
     <section class="chapter center">
       <h1>i said right this second!</h1>
