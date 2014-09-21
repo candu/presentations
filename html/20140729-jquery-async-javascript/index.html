@@ -85,7 +85,7 @@
       </p>
     </section>
     <section class="center">
-      <div class="title">the setTimeout(..., 0) trick</div>
+      <div class="title"><a href="https://stackoverflow.com/questions/779379/why-is-settimeoutfn-0-sometimes-useful">the setTimeout(..., 0) trick</a></div>
       <pre><code data-code-target="#js_dom_waiting_fixed"></code></pre>
       <button id="btn_dom_waiting_fixed">run it!</button>
       <script id="js_dom_waiting_fixed">
@@ -289,12 +289,7 @@
       <pre><code data-code-target="#js_ajax_new_style"></code></pre>
       <button id="btn_ajax_new_style">run it!</button>
       <script id="js_ajax_new_style">
-  /* old-style:
-   *
-   * $.getJSON('json/a.json', function(a) {
-   *   alert(JSON.stringify(a));
-   * });
-   */
+  // $.getJSON('json/a.json', alertJSON);
   $('#btn_ajax_new_style').click(function() {
     $.getJSON('json/a.json').then(alertJSON);
   });
@@ -371,9 +366,9 @@
     </section>
     <section class="center">
       <div class="title">for your promise needs:</div>
-      <h3><a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise API</a></h3>
       <h3><a target="_blank" href="http://api.jquery.com/category/deferred-object/">$.Deferred()</a></h3>
       <h3><a target="_blank" href="https://github.com/kriskowal/q">Q</a></h3>
+      <h3><a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise API</a> <small>(ES6)</small></h3>
     </section>
     <section class="chapter center">
       <h1>what's the big event?</h1>
@@ -386,9 +381,9 @@
   $('#btn_jquery_custom_events').on('foo', function() {
     alert('foo');
   }).click(function() {
-    window.setTimeout(function() {
+    asyncWait(1000, function() {
       $('#btn_jquery_custom_events').trigger('foo');
-    }, 1000);
+    });
   });
       </script>
     </section>
@@ -420,9 +415,9 @@
     alert('foo');
   });
   $('#btn_event_dispatcher_action').click(function() {
-    window.setTimeout(function() {
+    asyncWait(1000, function() {
       dispatcher.trigger('foo');
-    }, 1000);
+    });
   });
       </script>
     </section>
@@ -432,12 +427,11 @@
       <button id="btn_event_dom_waiting">run it!</button>
       <script id="js_event_dom_waiting">
   dispatcher.on('bar', function() {
+    busyWait(1000);
     $('#btn_event_dom_waiting').css('background-color', 'yellow');
   });
   $('#btn_event_dom_waiting').click(function() {
     $('#btn_event_dom_waiting').css('background-color', 'red');
-    var start = new Date();
-    while (new Date() - start < 1000) {}  // busy wait...
     dispatcher.trigger('bar');
   });
       </script>
