@@ -561,28 +561,6 @@
       </script>
     </section>
     <section class="center">
-      <div class="title"><a target="_blank" href="https://github.com/candu/gg">gg</a></div>
-      <p>
-        <img src="img/gg_github.png" />
-      </p>
-    </section>
-    <section class="center">
-      <div class="title">gg.wait()</div>
-      <pre><code data-code-target="#js_gg_wait"></code></pre>
-      <button id="btn_gg_wait">run it!</button>
-      <script id="js_gg_wait">
-  function* genJSON(url) {
-    return (yield gg.wait($.getJSON(url)));
-  }
-  function* genABC() {
-    return (yield gg.waitAll(_.map(urls, genJSON)));
-  }
-  $('#btn_gg_wait').click(function() {
-    gg.run(genABC(), function(err, result) { alertJSON(result); });
-  });
-      </script>
-    </section>
-    <section class="center">
       <div class="title">DIY generators?</div>
       <h3><a target="_blank" href="https://facebook.github.io/regenerator/">regenerator</a></h3>
       <h3><a target="_blank" href="https://github.com/google/traceur-compiler">Traceur</a></h3>
