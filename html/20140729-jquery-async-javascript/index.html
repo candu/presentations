@@ -55,9 +55,9 @@
       <h1>wait in line</h1>
     </section>
     <section class="center">
-      <div class="title">busyWait(), asyncWait()</div>
-      <pre><code data-code-target="#js_busy_wait"></code></pre>
-      <script id="js_busy_wait">
+      <div class="title">some helper functions</div>
+      <pre><code data-code-target="#js_helpers"></code></pre>
+      <script id="js_helpers">
   function busyWait(ms) {
     var start = new Date();
     while (new Date() - start < ms) {}  // busy wait...
@@ -65,6 +65,10 @@
   function asyncWait(ms, fn) {
     return window.setTimeout(fn, ms);
   };
+
+  function alertJSON(value) {
+    alert(JSON.stringify(value));
+  }
       </script>
     </section>
     <section class="center">
@@ -170,10 +174,6 @@
       <pre><code data-code-target="#js_ajax_old_style"></code></pre>
       <button id="btn_5">run it!</button>
       <script id="js_ajax_old_style">
-  function alertJSON(value) {
-    alert(JSON.stringify(value));
-  }
-
   $('#btn_5').click(function() {
     $.getJSON('json/a.json', alertJSON);
   });
@@ -197,14 +197,21 @@
     </section>
     <section class="center">
       <div class="title">named callbacks</div>
-      <pre><code data-code-target="#js_named_callbacks"></code></pre>
+      <div class="side-by-side">
+        <pre><code data-code-target="#js_named_callbacks"></code></pre>
+        <pre><code data-code-target="#js_pyramid_of_doom"></code></pre>
+      </div>
       <button id="btn_7">run it!</button>
       <script id="js_named_callbacks">
   function a(doneA, doneB) {
-    $.getJSON('json/a.json', function(a) { doneA(a, doneB); });
+    $.getJSON('json/a.json', function(a) {
+      doneA(a, doneB);
+    });
   }
   function b(a, doneB) {
-    $.getJSON('json/b.json', function(b) { doneB(a, b); });
+    $.getJSON('json/b.json', function(b) {
+      doneB(a, b);
+    });
   }
   function c(a, b) {
     $.getJSON('json/c.json', function(c) {
@@ -270,17 +277,33 @@
       </p>
     </section>
     <section class="center">
-      <div class="title">async.series()</div>
-      <pre><code data-code-target="#js_series_async"></code></pre>
+      <div class="title">node-style callbacks</div>
+      <pre><code data-code-target="#js_node_callbacks"></code></pre>
       <button id="btn_10">run it!</button>
-      <script id="js_series_async">
+      <script id="js_node_callbacks">
   function task(url) {
     return function(callback) {
       $.getJSON(url, function(result) { callback(null, result); });
     };
   }
   $('#btn_10').click(function() {
-    async.series(_.map(urls, task), function(err, abc) {
+    task('json/a.json')(function(err, a) {
+      alertJSON(a);
+    });
+  });
+      </script>
+    </section>
+    <section class="center">
+      <div class="title">async.series()</div>
+      <div class="side-by-side">
+        <pre><code data-code-target="#js_series_async"></code></pre>
+        <pre><code data-code-target="#js_series_execution"></code></pre>
+      </div>
+      <button id="btn_11">run it!</button>
+      <script id="js_series_async">
+  $('#btn_11').click(function() {
+    var tasks = _.map(urls, task);
+    async.series(tasks, function(err, abc) {
       alertJSON(abc);
     });
   });
@@ -288,24 +311,16 @@
     </section>
     <section class="center">
       <div class="title">async.parallel()</div>
-      <pre><code data-code-target="#js_parallel_async"></code></pre>
-      <button id="btn_11">run it!</button>
-      <script id="js_parallel_async">
-  $('#btn_11').click(function() {
-    async.parallel(_.map(urls, task), function(err, abc) {
-      alertJSON(abc);
-    });
-  });
-      </script>
-    </section>
-    <section class="center">
-      <div class="title">node-style callbacks</div>
-      <pre><code data-code-target="#js_node_callbacks"></code></pre>
+      <div class="side-by-side">
+        <pre><code data-code-target="#js_parallel_async"></code></pre>
+        <pre><code data-code-target="#js_parallel_execution"></code></pre>
+      </div>
       <button id="btn_12">run it!</button>
-      <script id="js_node_callbacks">
+      <script id="js_parallel_async">
   $('#btn_12').click(function() {
-    task('json/a.json')(function(err, a) {
-      alertJSON(a);
+    var tasks = _.map(urls, task);
+    async.parallel(tasks, function(err, abc) {
+      alertJSON(abc);
     });
   });
       </script>
@@ -328,15 +343,27 @@
     </section>
     <section class="center">
       <div class="title">chaining promises</div>
-      <pre><code data-code-target="#js_promise_chaining"></code></pre>
+      <div class="side-by-side">
+        <pre><code data-code-target="#js_promise_chaining"></code></pre>
+        <pre><code data-code-target="#js_pyramid_of_doom"></code></pre>
+      </div>
       <button id="btn_14">run it!</button>
       <script id="js_promise_chaining">
   $('#btn_14').click(function() {
     var a, b, c;
     $.getJSON('json/a.json')
-      .then(function(x) { a = x; return $.getJSON('json/b.json'); })
-      .then(function(x) { b = x; return $.getJSON('json/c.json'); })
-      .then(function(x) { c = x; alertJSON([a, b, c]); });
+      .then(function(x) {
+        a = x;
+        return $.getJSON('json/b.json');
+      })
+      .then(function(x) {
+        b = x;
+        return $.getJSON('json/c.json');
+      })
+      .then(function(x) {
+        c = x;
+        alertJSON([a, b, c]); 
+      });
   });
       </script>
     </section>
@@ -365,7 +392,10 @@
     </section>
     <section class="center">
       <div class="title">DIY promises, part 2</div>
-      <pre><code data-code-target="#js_promises_action"></code></pre>
+      <div class="side-by-side">
+        <pre><code data-code-target="#js_promises_action"></code></pre>
+        <pre><code data-code-target="#js_ajax_new_style"></code></pre>
+      </div>
       <button id="btn_15">run it!</button>
       <script id="js_promises_action">
   function getJsonDiyPromise(url) {
@@ -381,13 +411,17 @@
     </section>
     <section class="center">
       <div class="title">DiyPromise.all()</div>
-      <pre><code data-code-target="#js_promises_all"></code></pre>
+      <div class="side-by-side">
+        <pre><code data-code-target="#js_promises_all"></code></pre>
+        <pre><code data-code-target="#js_parallel_execution"></code></pre>
+      </div>
       <button id="btn_16">run it!</button>
       <script id="js_promises_all">
   DiyPromise.all = function(ps) {
     var P = new DiyPromise();
     if (ps.length === 0) return P.resolve([]);
-    var numDone = 0, n = ps.length, results = new Array(n);
+    var numDone = 0, n = ps.length;
+    var results = new Array(n);
     _.each(ps, function(p, i) {
       p.then(function(result) {
         results[i] = result;
@@ -449,7 +483,10 @@
     </section>
     <section class="center">
       <div class="title">DIY event dispatcher, part 2</div>
-      <pre><code data-code-target="#js_event_dispatcher_action"></code></pre>
+      <div class="side-by-side">
+        <pre><code data-code-target="#js_event_dispatcher_action"></code></pre>
+        <pre><code data-code-target="#js_jquery_custom_events"></code></pre>
+      </div>
       <button id="btn_18">run it!</button>
       <script id="js_event_dispatcher_action">
   var dispatcher = new EventDispatcher();
@@ -465,16 +502,19 @@
     </section>
     <section class="center">
       <div class="title">event evaluation is synchronous</div>
-      <pre><code data-code-target="#js_event_dom_waiting"></code></pre>
+      <div class="side-by-side">
+        <pre><code data-code-target="#js_event_dom_waiting"></code></pre>
+        <pre><code data-code-target="#js_dom_waiting"></code></pre>
+      </div>
       <button id="btn_19">run it!</button>
       <script id="js_event_dom_waiting">
-  dispatcher.on('bar', function() {
-    busyWait(1000);
-    $('#btn_19').css('background-color', 'yellow');
-  });
   $('#btn_19').click(function() {
     $('#btn_19').css('background-color', 'red');
     dispatcher.trigger('bar');
+  });
+  dispatcher.on('bar', function() {
+    busyWait(1000);
+    $('#btn_19').css('background-color', 'yellow');
   });
       </script>
     </section>
@@ -568,7 +608,10 @@
     </section>
     <section class="center">
       <div class="title">generators and promises, part 4</div>
-      <pre><code data-code-target="#js_gen_spawn_action"></code></pre>
+      <div class="side-by-side">
+        <pre><code data-code-target="#js_gen_spawn_action"></code></pre>
+        <pre><code data-code-target="#js_gen_promises_action"></code></pre>
+      </div>
       <button id="btn_23">run it!</button>
       <script id="js_gen_spawn_action">
   $('#btn_23').click(function() {
@@ -589,11 +632,14 @@
     </section>
     <section class="center">
       <div class="title">co()</div>
-      <pre><code data-code-target="#js_co"></code></pre>
+      <div class="side-by-side">
+        <pre><code data-code-target="#js_co"></code></pre>
+        <pre><code data-code-target="#js_gen_spawn_action"></code></pre>
+      </div>
       <button id="btn_24">run it!</button>
       <script id="js_co">
   $('#btn_24').click(function() {
-    co(function *() {
+    co(function*() {
       var a = $.getJSON('json/a.json');
       var b = $.getJSON('json/b.json');
       var c = $.getJSON('json/c.json');
@@ -639,7 +685,10 @@
     </section>
     <section class="center">
       <div class="title"><a target="_blank" href="https://github.com/YuzuJS/setImmediate">setImmediate()</a></div>
-      <pre><code data-code-target="#js_set_immediate"></code></pre>
+      <div class="side-by-side">
+        <pre><code data-code-target="#js_set_immediate"></code></pre>
+        <pre><code data-code-target="#js_timer_resolution"></code></pre>
+      </div>
       <button id="btn_26">run it!</button>
       <script id="js_set_immediate">
   $('#btn_26').click(function() {
@@ -681,19 +730,21 @@
     </section>
     <section class="center">
       <div class="title">the postMessage() trick, part 2</div>
-      <pre><code data-code-target="#js_post_message_action"></code></pre>
+      <div class="side-by-side">
+        <pre><code data-code-target="#js_post_message_action"></code></pre>
+        <pre><code data-code-target="#js_set_immediate"></code></pre>
+      </div>
       <button id="btn_27">run it!</button>
       <script id="js_post_message_action">
   $('#btn_27').click(function() {
     var start = new Date(), numCalls = 0;
-    function callback() {
+    (function callback() {
       if (new Date() - start >= 1000) {
         return alert('numCalls: ' + numCalls);
       }
       numCalls++;
       window.setZeroTimeout(callback);
-    }
-    window.setZeroTimeout(callback);
+    })();
   });
       </script>
     </section>
@@ -709,7 +760,9 @@
     this._delay = delay;
   };
   WatchdogTimer.prototype.kick = function() {
-    if (this._timeout) window.clearTimeout(this._timeout);
+    if (this._timeout) {
+      window.clearTimeout(this._timeout);
+    }
     this._timeout = window.setTimeout(function() {
       alert('bam!');
     }, this._delay);
@@ -722,7 +775,10 @@
     </section>
     <section class="center">
       <div class="title">_.debounce</div>
-      <pre><code data-code-target="#js_debounce"></code></pre>
+      <div class="side-by-side">
+        <pre><code data-code-target="#js_debounce"></code></pre>
+        <pre><code data-code-target="#js_watchdog_timer"></code></pre>
+      </div>
       <button id="btn_29">run it!</button>
       <script id="js_debounce">
   var kick = _.debounce(function() {
@@ -742,33 +798,40 @@
   $('#btn_30').click(function() {
     var fps = 0, last = new Date() - 1000, f = 0.1;
     function render() {
-      var now = new Date(); var dt = now - last; last = now;
+      var now = new Date(), dt = now - last;
+      last = now;
       fps = (1 - f) * fps + f * 1000 / dt;
-      $('#btn_30 + div').text('fps: ' + Math.round(fps));
+      $('#btn_30 + div')
+        .text('fps: ' + Math.round(fps));
     }
     (function loop() {
-      render();
-      window.setTimeout(loop, Math.max(0, 16 - (new Date() - last)));
+      render(); var dt = new Date() - last;
+      window.setTimeout(loop, Math.max(0, 16 - dt));
     })();
   });
       </script>
     </section>
     <section class="center">
       <div class="title">requestAnimationFrame()</div>
-      <pre><code data-code-target="#js_raf_loop"></code></pre>
+      <div class="side-by-side">
+        <pre><code data-code-target="#js_raf_loop"></code></pre>
+        <pre><code data-code-target="#js_anim_loop"></code></pre>
+      </div>
       <button id="btn_31">run it!</button>
       <div class="output">fps: 0</div>
       <script id="js_raf_loop">
   $('#btn_31').click(function() {
     var fps = 0, last = new Date() - 1000, f = 0.1;
     function render() {
-      var now = new Date(); var dt = now - last; last = now;
+      var now = new Date(), dt = now - last;
+      last = now;
       fps = (1 - f) * fps + f * 1000 / dt;
-      $('#btn_31 + div').text('fps: ' + Math.round(fps));
+      $('#btn_31 + div')
+        .text('fps: ' + Math.round(fps));
     }
     (function loop() {
-      window.requestAnimationFrame(loop);
       render();
+      window.requestAnimationFrame(loop);
     })();
   });
       </script>
