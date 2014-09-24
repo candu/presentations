@@ -129,7 +129,8 @@
       asyncWait(0, function() {
         var wait = Math.floor(200 * Math.random());
         busyWait(wait);
-        $('<span />').text(i).appendTo($('#btn_3 + div'));
+        $('<span />').text(i)
+          .appendTo($('#btn_3 + div'));
       });
     })
   });
@@ -137,7 +138,10 @@
     </section>
     <section class="center">
       <div class="title">events are queued, part 2</div>
-      <pre><code data-code-target="#js_event_queue_fixed"></code></pre>
+      <div class="side-by-side">
+        <pre><code data-code-target="#js_event_queue_fixed"></code></pre>
+        <pre><code data-code-target="#js_event_queue"></code></pre>
+      </div>
       <button id="btn_4">run it!</button>
       <div class="output"></div>
       <script id="js_event_queue_fixed">
@@ -146,7 +150,8 @@
     _.each(_.range(10), function(i) {
       var wait = Math.floor(200 * Math.random());
       asyncWait(wait, function() {
-        $('<span />').text(i).appendTo($('#btn_4 + div'));
+        $('<span />').text(i)
+          .appendTo($('#btn_4 + div'));
       });
     })
   });
