@@ -105,9 +105,9 @@
     <section class="center">
       <div class="title">events wait their turn</div>
       <pre><code data-code-target="#js_timeout_waiting"></code></pre>
-      <button id="btn_timeout_waiting">run it!</button>
+      <button id="btn_2">run it!</button>
       <script id="js_timeout_waiting">
-  $('#btn_timeout_waiting').click(function() {
+  $('#btn_2').click(function() {
     var start = new Date();
     asyncWait(0, function() {
       var elapsed = new Date() - start;
@@ -120,16 +120,16 @@
     <section class="center">
       <div class="title">events are queued, part 1</div>
       <pre><code data-code-target="#js_event_queue"></code></pre>
-      <button id="btn_event_queue">run it!</button>
-      <div id="output_event_queue"></div>
+      <button id="btn_3">run it!</button>
+      <div class="output"></div>
       <script id="js_event_queue">
-  $('#btn_event_queue').click(function() {
-    $('#output_event_queue').empty();
+  $('#btn_3').click(function() {
+    $('#btn_3 + div').empty();
     _.each(_.range(10), function(i) {
       asyncWait(0, function() {
         var wait = Math.floor(200 * Math.random());
         busyWait(wait);
-        $('<span />').text(i).appendTo($('#output_event_queue'));
+        $('<span />').text(i).appendTo($('#btn_3 + div'));
       });
     })
   });
@@ -138,15 +138,15 @@
     <section class="center">
       <div class="title">events are queued, part 2</div>
       <pre><code data-code-target="#js_event_queue_fixed"></code></pre>
-      <button id="btn_event_queue_fixed">run it!</button>
-      <div id="output_event_queue_fixed"></div>
+      <button id="btn_4">run it!</button>
+      <div class="output"></div>
       <script id="js_event_queue_fixed">
-  $('#btn_event_queue_fixed').click(function() {
-    $('#output_event_queue_fixed').empty();
+  $('#btn_4').click(function() {
+    $('#btn_4 + div').empty();
     _.each(_.range(10), function(i) {
       var wait = Math.floor(200 * Math.random());
       asyncWait(wait, function() {
-        $('<span />').text(i).appendTo($('#output_event_queue_fixed'));
+        $('<span />').text(i).appendTo($('#btn_4 + div'));
       });
     })
   });
@@ -748,6 +748,9 @@
     <!-- highlighting -->
     <script>
     $(document).ready(function() {
+      $('button').each(function(i, button) {
+        button.innerHTML = '#' + button.id;
+      });
       $('pre > code').each(function(i, block) {
         var $block = $(block);
         var codeTarget = $block.data('codeTarget');

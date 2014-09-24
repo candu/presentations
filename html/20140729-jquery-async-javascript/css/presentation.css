@@ -3,6 +3,7 @@
 }
 
 pre {
+  border: 4px solid #6d3;
   margin: 0.5em 0px;
 }
 
@@ -14,6 +15,24 @@ pre > code {
 button {
   cursor: pointer;
   font-size: 80%;
+  border-radius: 8px;
+}
+
+.output {
+  border: 1px solid #666;
+  border-radius: 8px;
+  height: 55px;
+  margin-top: 5px;
+  position: relative;
+}
+
+.output::before {
+  content: 'output';
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  font-size: 1rem;
+  color: #666;
 }
 
 .hljs {
@@ -36,5 +55,5 @@ button {
 }
 
 .side-by-side > pre > code {
-  font-size: 1rem;
+  font-size: 1.1rem;
 }
