@@ -58,6 +58,10 @@
       <div class="title">some helper functions</div>
       <pre><code data-code-target="#js_helpers"></code></pre>
       <script id="js_helpers">
+  function alertJSON(value) {
+    alert(JSON.stringify(value));
+  }
+
   function busyWait(ms) {
     var start = new Date();
     while (new Date() - start < ms) {}  // busy wait...
@@ -65,10 +69,6 @@
   function asyncWait(ms, fn) {
     return window.setTimeout(fn, ms);
   };
-
-  function alertJSON(value) {
-    alert(JSON.stringify(value));
-  }
       </script>
     </section>
     <section class="center">
@@ -431,7 +431,7 @@
     return P;
   };
   $('#btn_16').click(function() {
-    var ps = _.map(urls, getJsonDiyPromise);
+    var ps = _.map(urls, getDiyPromise);
     DiyPromise.all(ps).then(alertJSON);
   });
       </script>
@@ -461,23 +461,28 @@
     </section>
     <section class="center">
       <div class="title">DIY event dispatcher, part 1</div>
-      <pre><code data-code-target="#js_event_dispatcher"></code></pre>
+      <div class="side-by-side">
+        <pre><code data-code-target="#js_event_dispatcher"></code></pre>
+        <pre><code data-code-target="#js_promises"></code></pre>
+      </div>
       <script id="js_event_dispatcher">
   var EventDispatcher = function() {
     this._callbacks = {};
   };
-  EventDispatcher.prototype.trigger = function(type /* arg, ... */) {
+  EventDispatcher.prototype.trigger = function(
+      type /* , arg, ... */) {
     if (!_.has(this._callbacks, type)) return;
-    var args = Array.prototype.slice.call(arguments, 1);
-    _.each(this._callbacks[type], function(callback) {
-      callback.apply(null, args);
+    var args = [].slice.call(arguments, 1);
+    _.each(this._callbacks[type], function(fn) {
+      fn.apply(null, args);
     });
   };
-  EventDispatcher.prototype.on = function(type, callback) {
+  EventDispatcher.prototype.on = function(
+      type, fn) {
     if (!_.has(this._callbacks, type)) {
       this._callbacks[type] = [];
     }
-    this._callbacks[type].push(callback);
+    this._callbacks[type].push(fn);
   };
       </script>
     </section>
