@@ -6,10 +6,11 @@
     <link rel="stylesheet" type="text/css" href="../../css/stack.css">
     <link rel="stylesheet" type="text/css" href="../../css/webfonts.css">
     <link rel="stylesheet" type="text/css" href="../../css/base.css">
-    <link rel="stylesheet" type="text/css" href="css/presentation.css">
 
     <script src="../../js/highlight-8.0.js"></script>
     <link rel="stylesheet" type="text/css" href="../../css/solarized_dark.css">
+    
+    <link rel="stylesheet" type="text/css" href="css/presentation.css">
 
     <script src="../../js/jquery-2.1.1.js"></script>
     <script src="../../js/underscore-1.6.0.js"></script>
@@ -69,12 +70,12 @@
     <section class="center">
       <div class="title">DOM updates wait their turn</div>
       <pre><code data-code-target="#js_dom_waiting"></code></pre>
-      <button id="btn_dom_waiting">run it!</button>
+      <button id="btn_0">run it!</button>
       <script id="js_dom_waiting">
-  $('#btn_dom_waiting').click(function() {
-    $('#btn_dom_waiting').css('background-color', 'red');
+  $('#btn_0').click(function() {
+    $('#btn_0').css('background-color', 'red');
     busyWait(1000);
-    $('#btn_dom_waiting').css('background-color', 'yellow');
+    $('#btn_0').css('background-color', 'yellow');
   });
       </script>
     </section>
@@ -86,14 +87,17 @@
     </section>
     <section class="center">
       <div class="title"><a href="https://stackoverflow.com/questions/779379/why-is-settimeoutfn-0-sometimes-useful">the setTimeout(..., 0) trick</a></div>
-      <pre><code data-code-target="#js_dom_waiting_fixed"></code></pre>
-      <button id="btn_dom_waiting_fixed">run it!</button>
+      <div class="side-by-side">
+        <pre><code data-code-target="#js_dom_waiting_fixed"></code></pre>
+        <pre><code data-code-target="#js_dom_waiting"></code></pre>
+      </div>
+      <button id="btn_1">run it!</button>
       <script id="js_dom_waiting_fixed">
-  $('#btn_dom_waiting_fixed').click(function() {
-    $('#btn_dom_waiting_fixed').css('background-color', 'red');
+  $('#btn_1').click(function() {
+    $('#btn_1').css('background-color', 'red');
     asyncWait(0, function() {
       busyWait(1000);
-      $('#btn_dom_waiting_fixed').css('background-color', 'yellow');
+      $('#btn_1').css('background-color', 'yellow');
     });
   });
       </script>
@@ -745,8 +749,9 @@
     <script>
     $(document).ready(function() {
       $('pre > code').each(function(i, block) {
-        var codeTarget = $(block).data('codeTarget');
-        $(block).text($(codeTarget).html());
+        var $block = $(block);
+        var codeTarget = $block.data('codeTarget');
+        $block.text($(codeTarget).html());
         hljs.highlightBlock(block);
       });
     });

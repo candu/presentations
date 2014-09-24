@@ -1,3 +1,11 @@
+.stack {
+  padding: 80px 40px;
+}
+
+pre {
+  margin: 0.5em 0px;
+}
+
 pre > code {
   font-size: 1.5rem;
   text-align: left;
@@ -6,4 +14,27 @@ pre > code {
 button {
   cursor: pointer;
   font-size: 80%;
+}
+
+.hljs {
+  padding: 0px;
+}
+
+.side-by-side > pre {
+  width: 48%;
+  display: inline-block;
+  vertical-align: top;
+  border: 4px solid #999;
+}
+
+.side-by-side > pre:first-child {
+  border: 4px solid #6d3;
+}
+
+.side-by-side > pre:last-child {
+  opacity: 0.8;
+}
+
+.side-by-side > pre > code {
+  font-size: 1rem;
 }
