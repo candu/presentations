@@ -173,6 +173,7 @@
   function alertJSON(value) {
     alert(JSON.stringify(value));
   }
+
   $('#btn_5').click(function() {
     $.getJSON('json/a.json', alertJSON);
   });
@@ -218,7 +219,9 @@
       <pre><code data-code-target="#js_series_execution"></code></pre>
       <button id="btn_8">run it!</button>
       <script id="js_series_execution">
-  var urls = _.map('abc', function(x) { return 'json/' + x + '.json'; });
+  var urls = _.map('abc', function(x) {
+    return 'json/' + x + '.json';
+  });
 
   function series(urls, done) {
     if (urls.length === 0) return done([]);
@@ -228,17 +231,23 @@
       });
     });
   }
-  $('#btn_8').click(function() { series(urls, alertJSON) });
+  $('#btn_8').click(function() {
+    series(urls, alertJSON);
+  });
       </script>
     </section>
     <section class="center">
       <div class="title">DIY parallel execution</div>
-      <pre><code data-code-target="#js_parallel_execution"></code></pre>
+      <div class="side-by-side">
+        <pre><code data-code-target="#js_parallel_execution"></code></pre>
+        <pre><code data-code-target="#js_series_execution"></code></pre>
+      </div>
       <button id="btn_9">run it!</button>
       <script id="js_parallel_execution">
   function parallel(urls, done) {
     if (urls.length === 0) return done([]);
-    var numDone = 0, n = urls.length, results = new Array(n);
+    var numDone = 0, n = urls.length;
+    var results = new Array(n);
     _.each(urls, function(url, i) {
       $.getJSON(url, function(result) {
         results[i] = result;
@@ -246,7 +255,9 @@
       });
     });
   }
-  $('#btn_9').click(function() { parallel(urls, alertJSON); });
+  $('#btn_9').click(function() {
+    parallel(urls, alertJSON);
+  });
       </script>
     </section>
     <section class="chapter center">
@@ -293,7 +304,9 @@
       <button id="btn_12">run it!</button>
       <script id="js_node_callbacks">
   $('#btn_12').click(function() {
-    task('json/a.json')(function(err, a) { alertJSON(a); });
+    task('json/a.json')(function(err, a) {
+      alertJSON(a);
+    });
   });
       </script>
     </section>
@@ -302,10 +315,12 @@
     </section>
     <section class="center">
       <div class="title">$.ajax(), new-style</div>
-      <pre><code data-code-target="#js_ajax_new_style"></code></pre>
+      <div class="side-by-side">
+        <pre><code data-code-target="#js_ajax_new_style"></code></pre>
+        <pre><code data-code-target="#js_ajax_old_style"></code></pre>
+      </div>
       <button id="btn_13">run it!</button>
       <script id="js_ajax_new_style">
-  // $.getJSON('json/a.json', alertJSON);
   $('#btn_13').click(function() {
     $.getJSON('json/a.json').then(alertJSON);
   });
