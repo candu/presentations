@@ -79,7 +79,7 @@
   $('#btn_0').click(function() {
     $('#btn_0').css('background-color', 'red');
     busyWait(1000);
-    $('#btn_0').css('background-color', 'yellow');
+    $('#btn_0').css('background-color', 'green');
   });
       </script>
     </section>
@@ -101,7 +101,7 @@
     $('#btn_1').css('background-color', 'red');
     asyncWait(0, function() {
       busyWait(1000);
-      $('#btn_1').css('background-color', 'yellow');
+      $('#btn_1').css('background-color', 'green');
     });
   });
       </script>
@@ -398,14 +398,14 @@
       </div>
       <button id="btn_15">run it!</button>
       <script id="js_promises_action">
-  function getJsonDiyPromise(url) {
+  function getDiyPromise(url) {
     var p = new DiyPromise();
     $.getJSON(url, p.resolve.bind(p));
     return p;
   };
   $('#btn_15').click(function() {
-    getJsonDiyPromise('json/a.json').then(alertJSON);
-    // oops, we didn't implement chainable promises
+    getDiyPromise('json/a.json').then(alertJSON);
+    // oops, our promises aren't chainable
   });
       </script>
     </section>
@@ -514,7 +514,7 @@
   });
   dispatcher.on('bar', function() {
     busyWait(1000);
-    $('#btn_19').css('background-color', 'yellow');
+    $('#btn_19').css('background-color', 'green');
   });
       </script>
     </section>

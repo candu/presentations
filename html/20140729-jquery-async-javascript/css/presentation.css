@@ -1,5 +1,5 @@
 .stack {
-  padding: 80px 40px;
+  padding: 80px 20px;
 }
 
 pre {
@@ -55,5 +55,5 @@ button {
 }
 
 .side-by-side > pre > code {
-  font-size: 1.1rem;
+  font-size: 1.2rem;
 }
