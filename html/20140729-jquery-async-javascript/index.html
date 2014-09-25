@@ -84,12 +84,6 @@
       </script>
     </section>
     <section class="center">
-      <div class="title">welcome to JavaScript!</div>
-      <p>
-        <img src="img/js_event_loop.png" />
-      </p>
-    </section>
-    <section class="center">
       <div class="title"><a href="https://stackoverflow.com/questions/779379/why-is-settimeoutfn-0-sometimes-useful">the setTimeout(..., 0) trick</a></div>
       <div class="side-by-side">
         <pre><code data-code-target="#js_dom_waiting_fixed"></code></pre>
@@ -162,8 +156,9 @@
       </script>
     </section>
     <section class="center">
+      <div class="title">JavaScript: asynchronous &#x2260; concurrent</div>
       <p>
-        <img src="img/js_is_coming.jpg" />
+        <img src="img/js_event_loop.png" />
       </p>
     </section>
     <section class="chapter center">
@@ -405,7 +400,6 @@
   };
   $('#btn_15').click(function() {
     getDiyPromise('json/a.json').then(alertJSON);
-    // oops, our promises aren't chainable
   });
       </script>
     </section>
@@ -531,33 +525,34 @@
       <pre><code data-code-target="#js_generators"></code></pre>
       <button id="btn_20">run it!</button>
       <script id="js_generators">
-  function* genIdMaker() {
-    var nextId = 0;
-    while (true) {
-      yield nextId++;
-    }
-  }
-  var idMaker = genIdMaker();
-  $('#btn_20').click(function() {
-    alert('nextId: ' + idMaker.next().value);
-  });
-      </script>
-    </section>
-    <section class="center">
-      <div class="title">yield*</div>
-      <pre><code data-code-target="#js_yield_star"></code></pre>
-      <button id="btn_21">run it!</button>
-      <script id="js_yield_star">
   function* genFoo() {
     yield 3;
     yield 2;
     yield 1;
     return 'liftoff!';
   }
-  function* genFooMain() { return (yield* genFoo()); }
-  var fooMain = genFooMain();
+  var myFoo = genFoo();
+  $('#btn_20').click(function() {
+    alertJSON(myFoo.next());
+  });
+      </script>
+    </section>
+    <section class="center">
+      <div class="title">yield*</div>
+      <div class="side-by-side">
+        <pre><code data-code-target="#js_yield_star"></code></pre>
+        <pre><code data-code-target="#js_generators"></code></pre>
+      </div>
+      <button id="btn_21">run it!</button>
+      <script id="js_yield_star">
+  function* genFooMain() {
+    var foo1 = yield* genFoo();
+    var foo2 = yield* genFoo();
+    return [foo1, foo2];
+  }
+  var myFooMain = genFooMain();
   $('#btn_21').click(function() {
-    alert(fooMain.next().value);
+    alertJSON(myFooMain.next());
   });
       </script>
     </section>
@@ -592,6 +587,7 @@
     return [a, b, c];
   }
   $('#btn_22').click(function() {
+    // why doesn't this work?
     alertJSON(runGen(genABCPromises()));
   });
       </script>
