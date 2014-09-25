@@ -76,6 +76,7 @@
       <pre><code data-code-target="#js_dom_waiting"></code></pre>
       <button id="btn_0">run it!</button>
       <script id="js_dom_waiting">
+  // what happens when I click the button?
   $('#btn_0').click(function() {
     $('#btn_0').css('background-color', 'red');
     busyWait(1000);
@@ -91,6 +92,7 @@
       </div>
       <button id="btn_1">run it!</button>
       <script id="js_dom_waiting_fixed">
+  // why does this work?
   $('#btn_1').click(function() {
     $('#btn_1').css('background-color', 'red');
     asyncWait(0, function() {
@@ -109,6 +111,7 @@
     var start = new Date();
     asyncWait(0, function() {
       var elapsed = new Date() - start;
+      // what will elapsed be?
       alert('elapsed: ' + elapsed + ' ms');
     });
     busyWait(1000);
@@ -127,6 +130,7 @@
       asyncWait(0, function() {
         var wait = Math.floor(200 * Math.random());
         busyWait(wait);
+        // what order do these occur in?
         $('<span />').text(i)
           .appendTo($('#btn_3 + div'));
       });
@@ -179,6 +183,7 @@
       <pre><code data-code-target="#js_pyramid_of_doom"></code></pre>
       <button id="btn_6">run it!</button>
       <script id="js_pyramid_of_doom">
+  // what problems does this solve?  cause?
   $('#btn_6').click(function() {
     $.getJSON('json/a.json', function(a) {
       $.getJSON('json/b.json', function(b) {
@@ -198,6 +203,7 @@
       </div>
       <button id="btn_7">run it!</button>
       <script id="js_named_callbacks">
+  // what problems does this solve?  cause?
   function a(doneA, doneB) {
     $.getJSON('json/a.json', function(a) {
       doneA(a, doneB);
@@ -225,6 +231,7 @@
     return 'json/' + x + '.json';
   });
 
+  // how could series() be improved?
   function series(urls, done) {
     if (urls.length === 0) return done([]);
     $.getJSON(urls[0], function(first) {
@@ -246,6 +253,7 @@
       </div>
       <button id="btn_9">run it!</button>
       <script id="js_parallel_execution">
+  // how could parallel() be improved?
   function parallel(urls, done) {
     if (urls.length === 0) return done([]);
     var numDone = 0, n = urls.length;
@@ -276,6 +284,7 @@
       <pre><code data-code-target="#js_node_callbacks"></code></pre>
       <button id="btn_10">run it!</button>
       <script id="js_node_callbacks">
+  // what are we doing here, and why?
   function task(url) {
     return function(callback) {
       $.getJSON(url, function(result) { callback(null, result); });
@@ -366,6 +375,7 @@
       <div class="title">DIY promises, part 1</div>
       <pre><code data-code-target="#js_promises"></code></pre>
       <script id="js_promises">
+  // what is missing from DiyPromise?
   var DiyPromise = function() {
     this._callbacks = [];
     this._done = false;
@@ -393,6 +403,7 @@
       </div>
       <button id="btn_15">run it!</button>
       <script id="js_promises_action">
+  // how does getDiyPromise() work?
   function getDiyPromise(url) {
     var p = new DiyPromise();
     $.getJSON(url, p.resolve.bind(p));
@@ -460,6 +471,7 @@
         <pre><code data-code-target="#js_promises"></code></pre>
       </div>
       <script id="js_event_dispatcher">
+  // what is missing from EventDispatcher?
   var EventDispatcher = function() {
     this._callbacks = {};
   };
@@ -508,6 +520,7 @@
       <button id="btn_19">run it!</button>
       <script id="js_event_dom_waiting">
   $('#btn_19').click(function() {
+    // why does it never turn red here?
     $('#btn_19').css('background-color', 'red');
     dispatcher.trigger('bar');
   });
@@ -545,6 +558,7 @@
       </div>
       <button id="btn_21">run it!</button>
       <script id="js_yield_star">
+  // what is yield* doing?
   function* genFooMain() {
     var foo1 = yield* genFoo();
     var foo2 = yield* genFoo();
@@ -560,17 +574,20 @@
       <div class="title">generators and promises, part 1</div>
       <pre><code data-code-target="#js_gen_promises"></code></pre>
       <script id="js_gen_promises">
-  var GenPromise = function(p) {
-    var g = (function*() { return yield(null); })();
-    p.then(g.next.bind(g));
+  var GenPromise = function(P) {
+    var g = (function*() { return yield('dummy'); })();
+    P.then(g.next.bind(g));
     return g;
   };
   function genPromise(url) {
     return GenPromise($.getJSON(url));
   }
+  // how does runGen() work?
   function runGen(gen) {
     var next = gen.next();
-    while (!next.done) { next = gen.next(); }
+    while (!next.done) {
+      next = gen.next();
+    }
     return next.value;
   }
       </script>
@@ -587,8 +604,9 @@
     return [a, b, c];
   }
   $('#btn_22').click(function() {
-    // why doesn't this work?
-    alertJSON(runGen(genABCPromises()));
+    // what happened to our JSON responses?
+    var abc = runGen(genABCPromises());
+    alertJSON(abc);
   });
       </script>
     </section>
@@ -596,15 +614,16 @@
       <div class="title">generators and promises, part 3</div>
       <pre><code data-code-target="#js_gen_spawn"></code></pre>
       <script id="js_gen_spawn">
+  // what is spawn() doing?
   function spawn(generatorFunc) {
     var gen = generatorFunc();
     var P = new DiyPromise();
-    function runGen(result) {
+    function runGenWithPromises(result) {
       var result = gen.next(result);
       if (result.done) return P.resolve(result.value);
-      result.value.then(runGen);
+      result.value.then(runGenWithPromises);
     }
-    runGen();
+    runGenWithPromises();
     return P;
   }
       </script>
@@ -618,6 +637,7 @@
       <button id="btn_23">run it!</button>
       <script id="js_gen_spawn_action">
   $('#btn_23').click(function() {
+    // why does this work?
     spawn(function*() {
       var a = yield getDiyPromise('json/a.json');
       var b = yield getDiyPromise('json/b.json');
@@ -642,6 +662,7 @@
       <button id="btn_24">run it!</button>
       <script id="js_co">
   $('#btn_24').click(function() {
+    // how can we use DiyPromises with co?
     co(function*() {
       var a = getDiyPromise('json/a.json');
       var b = getDiyPromise('json/b.json');
@@ -661,7 +682,7 @@
       <h1>i said right this second!</h1>
     </section>
     <section class="center">
-      <div class="title">timer resolution is ~4 ms</div>
+      <div class="title">timer resolution</div>
       <pre><code data-code-target="#js_timer_resolution"></code></pre>
       <button id="btn_25">run it!</button>
       <script id="js_timer_resolution">
@@ -669,6 +690,7 @@
     var start = new Date(), numCalls = 0;
     (function callbackTimeout() {
       if (new Date() - start >= 1000) {
+        // what will numCalls be?
         return alert('numCalls: ' + numCalls);
       }
       numCalls++;
@@ -698,6 +720,7 @@
     var start = new Date(), numCalls = 0;
     (function callbackImmediate() {
       if (new Date() - start >= 1000) {
+        // why is this so much faster?
         return alert('numCalls: ' + numCalls);
       }
       numCalls++;
@@ -716,6 +739,7 @@
       <div class="title">the postMessage() trick, part 1</div>
       <pre><code data-code-target="#js_post_message"></code></pre>
       <script id="js_post_message">
+  // how does this work?
   (function() {
     var callbacks = [];
     window.addEventListener('message', function(event) {
@@ -759,6 +783,7 @@
       <pre><code data-code-target="#js_watchdog_timer"></code></pre>
       <button id="btn_28">run it!</button>
       <script id="js_watchdog_timer">
+  // what does this do?
   var WatchdogTimer = function(delay) {
     this._delay = delay;
   };
