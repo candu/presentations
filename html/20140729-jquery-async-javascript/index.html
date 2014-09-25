@@ -597,13 +597,15 @@
       <pre><code data-code-target="#js_gen_spawn"></code></pre>
       <script id="js_gen_spawn">
   function spawn(generatorFunc) {
-    function continuer(arg) {
-      var result = generator.next(arg);
-      if (result.done) return result.value;
-      else return Promise.resolve(result.value).then(continuer);
+    var gen = generatorFunc();
+    var P = new DiyPromise();
+    function runGen(result) {
+      var result = gen.next(result);
+      if (result.done) return P.resolve(result.value);
+      result.value.then(runGen);
     }
-    var generator = generatorFunc();
-    return continuer();
+    runGen();
+    return P;
   }
       </script>
     </section>
@@ -617,9 +619,9 @@
       <script id="js_gen_spawn_action">
   $('#btn_23').click(function() {
     spawn(function*() {
-      var a = yield $.getJSON('json/a.json');
-      var b = yield $.getJSON('json/b.json');
-      var c = yield $.getJSON('json/c.json');
+      var a = yield getDiyPromise('json/a.json');
+      var b = yield getDiyPromise('json/b.json');
+      var c = yield getDiyPromise('json/c.json');
       return [a, b, c];
     }).then(alertJSON);
   });
@@ -641,9 +643,9 @@
       <script id="js_co">
   $('#btn_24').click(function() {
     co(function*() {
-      var a = $.getJSON('json/a.json');
-      var b = $.getJSON('json/b.json');
-      var c = $.getJSON('json/c.json');
+      var a = getDiyPromise('json/a.json');
+      var b = getDiyPromise('json/b.json');
+      var c = getDiyPromise('json/c.json');
       alertJSON(yield [a, b, c]);
     })(); 
   });
