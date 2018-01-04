@@ -50,6 +50,10 @@ blockquote > footer {
   font-size: 75%;
 }
 
+.si-logo {
+  margin-top: 64px;
+}
+
 .center {
   text-align: center;
 }
