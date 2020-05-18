@@ -17,16 +17,6 @@
 <script src='https://api.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js'></script>
 <link href='https://api.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css' rel='stylesheet' />
 
-<style>
-.map-container {
-	border: 2px solid #272727;
-	height: 100vh;
-	left: 0;
-	position: absolute;
-	top: 0;
-	width: 100vw;
-}
-</style>
 </head>
 <body>
 	<div class="reveal">
@@ -35,22 +25,23 @@
 			<section>
 				<h1>Map All The Things</h1>
 				<h2>With Mapbox GL</h2>
+				<div class="stretch"></div>
 				<p>
-					Evan Savage
+					<a href="https://savageevan.com/">Evan Savage</a>
 				</p>
 
 				<aside class="notes">
 				</aside>
 			</section>
 
-			<section data-background-interactive>
-				<h2>a map!</h2>
+			<section data-background-interactive data-map-id="helloWorld">
+				<h2>Hello, World!</h2>
 				<aside class="notes">
 				</aside>
 			</section>
 
-			<section>
-				<h2>another map!</h2>
+			<section data-background-interactive data-map-id="helloToronto">
+				<h2>Toronto</h2>
 				<aside class="notes">
 				</aside>
 			</section>
@@ -94,8 +85,77 @@ async function initMapbox() {
   };
 }
 
+class MapOptions {
+	static _common() {
+		return {
+			dragRotate: false,
+			pitchWithRotate: false,
+			renderWorldCopies: true,
+			keyboard: false,
+			style: basemapStyle,
+		};
+	}
+
+	static _commonToronto() {
+		const bounds = BOUNDS_TORONTO;
+		return {
+			...MapOptions._common(),
+			bounds,
+			fitBoundsOptions: {
+				offset: [0, -64],
+			},
+			maxBounds: bounds,
+			minZoom: 10,
+			maxZoom: 19,
+			renderWorldCopies: false,
+		};
+	}
+
+	static get(mapId) {
+		return MapOptions[mapId]();
+	}
+
+	static getContainer() {
+		const $reveal = Reveal.getRevealElement();
+		const i = Reveal.getSlidePastCount() + 1;
+		const selector = `.slide-background:nth-child(${i}) > .slide-background-content`;
+		return $reveal.querySelector(selector);
+	}
+
+	static helloToronto() {
+		return MapOptions._commonToronto();
+	}
+
+	static helloWorld() {
+		return MapOptions._common();
+	}
+}
+
+function removeMap() {
+	if (map !== null) {
+		map.remove();
+		map = null;
+	}
+}
+
+function loadMap() {
+	const $currentSlide = Reveal.getCurrentSlide();
+	const { mapId } = $currentSlide.dataset;
+	console.log(mapId);
+	if (mapId !== undefined) {
+		const $mapContainer = MapOptions.getContainer();
+		const options = MapOptions.get(mapId);
+		console.log(options);
+		map = new mapboxgl.Map({
+			container: $mapContainer,
+			...options,
+		});
+	}
+}
+
 function initReveal() {
 	Reveal.initialize({
+		center: false,
 		hash: true,
 		dependencies: [
 			{ src: 'plugin/highlight/highlight.js' },
@@ -104,21 +164,11 @@ function initReveal() {
 	});
 
 	Reveal.addEventListener('slidechanged', function(evt) {
-		if (map !== null) {
-			map.remove();
-			map = null;
-		}
-
-		if (evt.currentSlide.dataset.backgroundInteractive !== undefined) {
-			const $mapContainer = document.querySelector('.slide-background:nth-child(2) > .slide-background-content');
-			map = new mapboxgl.Map({
-				bounds: BOUNDS_TORONTO,
-				container: $mapContainer,
-				keyboard: false,
-				style: basemapStyle,
-			});
-		}
+		removeMap();
+		loadMap();
 	});
+	Reveal.addEventListener('overviewshown', removeMap);
+	Reveal.addEventListener('overviewhidden', loadMap);
 }
 
 async function main() {
