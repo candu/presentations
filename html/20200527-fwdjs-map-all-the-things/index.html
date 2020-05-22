@@ -20,12 +20,16 @@
 <style>
 .highlight {
 	background-color: #ee0000;
-	font-size: 4rem;
-	padding: 0.25rem 0.5rem;
+	padding: 0 0.5rem;
+	text-transform: none;
 }
 
 img.about-me {
 	height: 200px;
+}
+
+.fade {
+	opacity: 0.3;
 }
 </style>
 </head>
@@ -54,25 +58,40 @@ img.about-me {
 				<img class="about-me" src="img/move.png">
 
 				<aside class="notes">
+					Code for Canada developer fellow working with City of Toronto on MOVE, which is a project
+					to bring decades of the City's collision and traffic volume data into a single platform.
 				</aside>
 			</section>
 
 			<section>
 				<h2>civic data &#x2665; maps</h2>
-				<p>TODO: images of maps</p>
+				<p>TODO: images of maps that use open data</p>
 
 				<aside class="notes">
+					when we talk about the sort of data that governments and civic organizations make use of,
+					a lot of it is geospatial: you can and often should put it on a map.
+					(TODO: examples)
+					a lot of the work we do on MOVE involves taking these civic datasets and carefully processing
+					them so that we can show them on a map.
+				</aside>
+			</section>
+
+			<section data-background-interactive data-map-id="helloWorld">
+				<h2><span class="highlight">Mapbox GL</span></h2>
+
+				<aside class="notes">
+					for the mapping part of that, we use Mapbox GL.  it's not the only mapping library out there:
+					there's other open-source libraries like Leaflet and OpenLayers.  web mapping is also not the
+					only approach: for instance, many people use ArcGIS or its open-source counterpart QGIS to work
+					with geospatial data.
 				</aside>
 			</section>
 
 			<section>
-				<h2>different sizes of data</h2>
+				<h2>different sizes</h2>
 				<ul>
 					<li>
 						<em>small-ish</em>: 1.2k schools
-					</li>
-					<li>
-						<em>medium</em>: 50k roadways
 					</li>
 					<li>
 						<em>big-ish</em>: 1.5M collisions
@@ -80,39 +99,246 @@ img.about-me {
 					<li>
 						<em>actually big</em>: 120M traffic volume readings
 					</li>
+					<li>TODO: notes about update rates?</li>
 				</ul>
 
 				<aside class="notes">
+					some datasets are fairly small: 1.2k schools and other educational institutions.
+					some are bigger: 1.5M collisions over 40 years.
+					some are really big: 120M traffic volume readings over same time period.
+					"small" and "big" are relative terms, but dictate what you can do.
 				</aside>
 			</section>
 
-			<section data-background-image="img/too-many-markers.png">
-				<span class="highlight">wat</span>
+			<section>
+				<h2><span class="highlight">wat</span></h2>
+				<p>TODO: map of all schools at zoom level 10, shown as markers</p>
 
 				<aside class="notes">
+					from human perspective, even "small" in this breakdown is "big".
+					everyone has seen a map like this.  impossible to tell what's going on,
+					and there's only 1.2k markers!
 				</aside>
 			</section>
 
-			<section data-background-image="img/zoom-level-matters.png">
-				<span class="highlight">that's better</span>
+			<section>
+				<h2><span class="highlight">that's better</span></h2>
+				<p>TODO: same map as previous slide, but zoomed in, with school icons, and with popups</p>
 
 				<aside class="notes">
+					same data, but it makes a lot more sense now.  we're close enough to see spatial
+					relationships, both between points and to other landmarks.  the iconography helps
+					explain what sort of thing we're looking at.  the popups provide more specific detail
+					on individual things.
+				</aside>
+			</section>
+
+			<section>
+				<h2>important questions</h2>
+				<ul>
+					<li>how can we <em>render</em> this much data?</li>
+					<li>how can we <em>understand</em> this much data?</li>
+					<li>how can we <em>process</em> this much data?</li>
+				</ul>
+
+				<aside class="notes">
+					going to focus on three important questions.  to handle larger datasets on maps, we
+					have to be able to render a lot of data at once.  to understand the data, we need to
+					make careful use of progressive disclosure techniques like aggregation and cluster
+				</aside>
+			</section>
+
+      <section data-background-color="#ee0000">
+				<h2>rendering</h2>
+				<ul>
+					<li>how can we <em>render</em> this much data?</li>
+					<li class="fade">how can we <em>understand</em> this much data?</li>
+					<li class="fade">how can we <em>process</em> this much data?</li>
+				</ul>
+
+				<aside class="notes">
+					let's start with rendering.  this is
 				</aside>
 			</section>
 
 			<section data-background-interactive data-map-id="helloWorld">
-				<h2>Hello, World!</h2>
+				<h2><span class="highlight">hello, world!</span></h2>
+
+				<aside class="notes">
+				</aside>
+			</section>
+
+			<section>
+				<h2>hello, Mapbox GL!</h2>
+
+				<pre>
+					<code data-line-numbers="1-2|3-10|11" data-trim>
+/* const basemapStyle = ... */
+/* const $mapContainer = ... */
+const options = {
+  container: $mapContainer,
+  dragRotate: false,
+  pitchWithRotate: false,
+  renderWorldCopies: true,
+  keyboard: false,
+  style: basemapStyle,
+};
+const map = new mapboxgl.Map(options);
+					</code>
+				</pre>
 
 				<aside class="notes">
 				</aside>
 			</section>
 
 			<section data-background-interactive data-map-id="helloToronto">
-				<h2>Toronto</h2>
+				<h2><span class="highlight">hello, Toronto!</span></h2>
 
 				<aside class="notes">
 				</aside>
-			</section>
+      </section>
+
+			<section>
+        <h2>how to put Toronto at the center of the universe</h2>
+
+				<pre>
+					<code data-line-numbers data-trim>
+/* TODO: show options to zoom into Toronto */
+					</code>
+				</pre>
+
+				<aside class="notes">
+				</aside>
+      </section>
+
+      <section>
+        <h2>getting collisions data</h2>
+        <p>TODO: explain this process</p>
+
+				<aside class="notes">
+				</aside>
+      </section>
+
+      <section>
+        <h2>GeoJSON source</h2>
+        <p>TODO: explain this process</p>
+
+				<aside class="notes">
+				</aside>
+      </section>
+
+      <section>
+				<h2><span class="highlight">we can do better</span></h2>
+        <p>TODO: map of collisions</p>
+
+				<aside class="notes">
+          <p>
+            the result is pretty jarring, and in more ways than one.  first: that's 500k collisions
+            over 10 years.  that means 50k per year, 150 per day, 6 per hour.  the vast majority are
+            minor, but the human impact is still staggering.
+          </p>
+
+          <p>
+            beyond the sheer scale of this problem, you can't really get a lot else out of this.  it's
+            like the markers.
+          </p>
+
+          <p>
+            one thing is surprising, though: our browser isn't falling over or locking up!  how is this
+            so <em>fast</em>?
+          </p>
+				</aside>
+      </section>
+
+      <section>
+        <h2>tiling</h2>
+        <p>TODO: slide with tiling</p>
+
+				<aside class="notes">
+          <p>
+            the answer is tiling!  this is how pretty much every mapping library and service works:
+            you divide your data into tiles at different zoom levels.  at each zoom level, you split
+            the previous level's tiles into four smaller tiles.
+          </p>
+          <p>
+            when you load a GeoJSON source, Mapbox GL builds a set of tiles on your data.  this takes
+            a bit of time up front (TODO: finish explanation)
+          </p>
+				</aside>
+      </section>
+
+      <section>
+        <h2>your data on vector tiles</h2>
+        <p>
+          TODO: before: raw data -> GeoJSON / SHP -> render to raster tiles -> map!
+        </p>
+        <p>
+          TODO: now: raw data -> GeoJSON -> vector tiles -> render using layer style -> map!
+        </p>
+
+				<aside class="notes">
+				</aside>
+      </section>
+
+      <section data-background-color="#ee0000">
+				<h2>understanding</h2>
+				<ul>
+					<li class="fade">how can we <em>render</em> this much data?</li>
+					<li>how can we <em>understand</em> this much data?</li>
+					<li class="fade">how can we <em>process</em> this much data?</li>
+				</ul>
+
+				<aside class="notes">
+				</aside>
+      </section>
+
+      <section>
+				<h2><span class="highlight">we can do better</span></h2>
+        <p>TODO: map of collisions</p>
+
+        <aside class="notes">
+				</aside>
+      </section>
+
+      <section>
+        <h2>what to do?</h2>
+        <p>images TODO: clustering, heatmaps, visual differentiation</p>
+
+				<aside class="notes">
+				</aside>
+      </section>
+
+      <section data-background-interactive data-map-id="helloToronto">
+				<h2><span class="highlight">hello, Toronto!</span></h2>
+
+				<aside class="notes">
+				</aside>
+      </section>
+
+			<section>
+        <h2>how to put Toronto at the center of the universe</h2>
+
+				<pre>
+					<code data-line-numbers data-trim>
+/* TODO: show options to zoom into Toronto */
+					</code>
+				</pre>
+
+				<aside class="notes">
+				</aside>
+      </section>
+
+      <section data-background-color="#ee0000">
+				<h2>processing</h2>
+				<ul>
+					<li class="fade">how can we <em>render</em> this much data?</li>
+					<li class="fade">how can we <em>understand</em> this much data?</li>
+					<li>how can we <em>process</em> this much data?</li>
+				</ul>
+
+				<aside class="notes">
+				</aside>
+      </section>
 		</div>
 	</div>
 <!-- END OF SLIDES -->
