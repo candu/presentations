@@ -270,10 +270,10 @@ const map = new mapboxgl.Map(options);
       <section>
         <h2>your data on vector tiles</h2>
         <p>
-          TODO: before: raw data -> GeoJSON / SHP -> render to raster tiles -> map!
+          TODO: before: [raw data -> GeoJSON / SHP -> render to raster tiles] -> [map]
         </p>
         <p>
-          TODO: now: raw data -> GeoJSON -> vector tiles -> render using layer style -> map!
+          TODO: now: [raw data -> GeoJSON] -> [vector tiles -> render using layer style -> map]
         </p>
 
 				<aside class="notes">
@@ -303,28 +303,132 @@ const map = new mapboxgl.Map(options);
       <section>
         <h2>what to do?</h2>
         <p>images TODO: clustering, heatmaps, visual differentiation</p>
+        <p>clustering: Map of the Jugger World</p>
+        <p>vis diff: MOVE</p>
 
 				<aside class="notes">
 				</aside>
       </section>
 
-      <section data-background-interactive data-map-id="helloToronto">
-				<h2><span class="highlight">hello, Toronto!</span></h2>
+      <section>
+        <h2><span class="highlight">clustering</span></h2>
+        <p>TODO: map with collisions clustered</p>
 
 				<aside class="notes">
+          group nearby points.  reduces clutter, but loses precision of representation!
 				</aside>
       </section>
 
 			<section>
-        <h2>how to put Toronto at the center of the universe</h2>
+        <h2>TODO: clustering explanation</h2>
 
 				<pre>
 					<code data-line-numbers data-trim>
-/* TODO: show options to zoom into Toronto */
+/* TODO: code */
 					</code>
 				</pre>
 
 				<aside class="notes">
+				</aside>
+      </section>
+
+      <section>
+        <h2><span class="highlight">heatmaps</span></h2>
+        <p>TODO: map with collisions heatmap</p>
+
+				<aside class="notes">
+          blur points together.  good for visualizing density, but doesn't work so
+          well with sparse data.  allows for weighting of points: maybe some are
+          more important than others (e.g. KSI)!
+				</aside>
+      </section>
+
+			<section>
+        <h2>TODO: heatmap explanation</h2>
+
+				<pre>
+					<code data-line-numbers data-trim>
+/* TODO: code */
+					</code>
+				</pre>
+
+				<aside class="notes">
+				</aside>
+      </section>
+
+      <section>
+        <h2><span class="highlight">all together now</span></h2>
+        <p>TODO: map with collisions heatmap that blends to clusters that blends to points</p>
+
+				<aside class="notes">
+          using Mapbox GL, we can set "zoom breakpoints" and blend layers together.
+          allows us to get the benefits of each at the appropriate zoom level
+				</aside>
+      </section>
+
+			<section>
+        <h2>TODO: zoom breakpoints explanation</h2>
+
+				<pre>
+					<code data-line-numbers data-trim>
+/* TODO: code */
+					</code>
+				</pre>
+
+				<aside class="notes">
+				</aside>
+      </section>
+
+      <section>
+        <h2><span class="highlight">visual differentiation</span></h2>
+        <p>TODO: distinguish KSI collisions from non-KSI collisions</p>
+
+				<aside class="notes">
+          focus attention to more important points: bigger, brighter, visually distinct.
+				</aside>
+      </section>
+
+			<section>
+        <h2>TODO: styling for visual differentiation</h2>
+
+				<pre>
+					<code data-line-numbers data-trim>
+/* TODO: code */
+					</code>
+				</pre>
+
+				<aside class="notes">
+				</aside>
+      </section>
+
+      <section>
+        <h2>styling on the fly</h2>
+        <p>
+          TODO: [raw data -> GeoJSON] -> [vector tiles -> render using layer style -> map]
+        </p>
+
+				<aside class="notes">
+				</aside>
+      </section>
+
+      <section>
+        <h2>other approaches</h2>
+        <p>
+          images TODO: MOVE legend with show / hide toggles; MOVE filter box; SharedStreets
+        </p>
+
+				<aside class="notes">
+          <p>
+            hide / show layers: when showing multiple datasets, can help users hide datasets that
+            aren't currently relevant to their task.  within datasets, can apply more fine-grained
+            filtering.
+          </p>
+          <p>
+            referencing systems: Toronto centreline, SharedStreets.  useful for answering questions
+            like "what happened at this intersection / on this segment of road?"  opens up possibility
+            of clustering by intersections / segments, which mitigates the clutter / precision tradeoff
+            of clustering.  this also allows selection gestures on intersections / segments.
+          </p>
 				</aside>
       </section>
 
@@ -337,6 +441,90 @@ const map = new mapboxgl.Map(options);
 				</ul>
 
 				<aside class="notes">
+				</aside>
+      </section>
+
+      <section>
+        <h2><span class="highlight">we're done, right?</span></h2>
+        <p>TODO: distinguish KSI collisions from non-KSI collisions</p>
+
+				<aside class="notes">
+          if you can load the whole dataset at once, GeoJSON layers actually work quite well!
+				</aside>
+      </section>
+
+      <section>
+        <h2>loading&hellip;</h2>
+        <p>
+          images TODO: gif of network tab loading collisions data
+        </p>
+
+				<aside class="notes">
+          what if you can't, though?  I can get away with loading a (TODO: size) file here,
+          because the file is on my computer and you're just watching my screen anyways.
+          in a production web application, though, this wouldn't fly.
+				</aside>
+      </section>
+
+      <section>
+        <h2>to the backend!</h2>
+        <p>
+          TODO: [raw data -> GeoJSON -> vector tiles] -> [render using layer style -> map]
+        </p>
+
+				<aside class="notes">
+				</aside>
+      </section>
+
+      <section>
+        <h2>prebuilt tiles: tippecanoe</h2>
+        <p>
+          TODO: ST_AsGeoJSON, tippecanoe command examples
+        </p>
+
+				<aside class="notes">
+          great for absolutely massive datasets!  lots of options for simplifying and
+          culling features to reduce tileset size.
+				</aside>
+      </section>
+
+      <section>
+        <h2>prebuilt tiles: mbtiles</h2>
+        <p>
+          TODO: sqlite look inside MBTiles file
+        </p>
+        <p>
+          TODO: link to mbtiles-server
+        </p>
+
+				<aside class="notes">
+          tippecanoe's output is an MBTiles archive.  this is just a sqlite database that
+          maps (z, x, y) tile coordinates to tile data.  there are tools like mbtiles-server
+          that allow you to quickly spin up a server for this archive.
+				</aside>
+      </section>
+
+      <section>
+        <h2>prebuilt tiles: mbutil</h2>
+        <p>
+          TODO: mbutil command, and output
+        </p>
+
+				<aside class="notes">
+          you can use mbutil to store the tiles as static files!  great for deploying to
+          a variety of on-prem and cloud environments.
+				</aside>
+      </section>
+
+      <section>
+        <h2>dynamic tiles</h2>
+        <p>
+          TODO: ST_AsMVT example
+        </p>
+
+				<aside class="notes">
+          great for quick prototyping of new vector tile sources on big datasets!
+          great for high zoom level tiles!  slow for tiles containing lots of features
 				</aside>
       </section>
 		</div>
