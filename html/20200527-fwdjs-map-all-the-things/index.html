@@ -19,21 +19,21 @@
 
 <style>
 .highlight {
-	background-color: #ee0000;
-	padding: 0 0.5rem;
-	text-transform: none;
+  background-color: #ee0000;
+  padding: 0 0.5rem;
+  text-transform: none;
 }
 
 img.about-me {
-	height: 200px;
+  height: 200px;
 }
 
 .fade {
-	opacity: 0.3;
+  opacity: 0.3;
 }
 
 .move-marker {
-	background-image: url('img/school.png');
+  background-image: url('img/school.png');
   background-size: cover;
   width: 50px;
   height: 50px;
@@ -42,217 +42,235 @@ img.about-me {
 }
 
 .mapboxgl-popup-content {
-	color: black;
-	font-size: 1.5rem;
-	line-height: 1.8rem;
+  color: black;
+  font-size: 1.5rem;
+  line-height: 1.8rem;
 }
 </style>
 </head>
 <body>
-	<div class="reveal">
-		<div class="map-container"></div>
-		<div class="slides">
-			<section>
-				<h1>Map All The Things</h1>
-				<h2>With Mapbox GL</h2>
-				<div class="stretch"></div>
-				<p>
-					<a href="https://savageevan.com/">Evan Savage</a>
-				</p>
+  <div class="reveal">
+    <div class="map-container"></div>
+    <div class="slides">
+      <section>
+        <h1>Map All The Things</h1>
+        <h2>With Mapbox GL</h2>
+        <div class="stretch"></div>
+        <p>
+          <a href="https://savageevan.com/">Evan Savage</a>
+        </p>
 
-				<aside class="notes">
-				</aside>
-			</section>
+        <aside class="notes">
+        </aside>
+      </section>
 
-			<section>
-				<h2>about me</h2>
-				<div>
-					<img class="about-me" src="img/cfc-web-logo.png">
-					<img class="about-me" src="img/share_toronto_twitter.jpg">
-				</div>
-				<img class="about-me" src="img/move.png">
+      <section>
+        <h2>about me</h2>
+        <div>
+          <img class="about-me" src="img/cfc-web-logo.png">
+          <img class="about-me" src="img/share_toronto_twitter.jpg">
+        </div>
+        <img class="about-me" src="img/move.png">
 
-				<aside class="notes">
-					Code for Canada developer fellow working with City of Toronto on MOVE, which is a project
-					to bring decades of the City's collision and traffic volume data into a single platform.
-				</aside>
-			</section>
+        <aside class="notes">
+          Code for Canada developer fellow working with City of Toronto on MOVE, which is a project
+          to bring decades of the City's collision and traffic volume data into a single platform.
+        </aside>
+      </section>
 
-			<section>
-				<h2>civic data &#x2665; maps</h2>
-				<img src="img/torontocivictransportation1915.jpg">
+      <section>
+        <h2>civic data &#x2665; maps</h2>
+        <img src="img/torontocivictransportation1915.jpg">
 
-				<aside class="notes">
-					<p>
-						when we talk about the sort of data that governments and civic organizations make use of,
-						a lot of it is geospatial: you can and often should put it on a map.  that's always been
-						true, as you can see here in this 1915 map exploring how people get around Toronto.
-					</p>
-					<p>
-						so the problem's not new, but we do have both larger datasets and better tools for working
-						with those datasets.  a lot of the work we do on MOVE fits this mould: what are the best tools
-						right now for rendering, understanding, and processing geospatial datasets?
-					</p>
-				</aside>
-			</section>
+        <aside class="notes">
+          <p>
+            when we talk about the sort of data that governments and civic organizations make use of,
+            a lot of it is geospatial: you can and often should put it on a map.  that's always been
+            true, as you can see here in this 1915 map exploring how people get around Toronto.
+          </p>
+          <p>
+            so the problem's not new, but we do have both larger datasets and better tools for working
+            with those datasets.  a lot of the work we do on MOVE fits this mould: what are the best tools
+            right now for rendering, understanding, and processing geospatial datasets?
+          </p>
+        </aside>
+      </section>
 
-			<section>
-				<h2>different sizes</h2>
-				<ul>
-					<li>
-						<em>small-ish</em>: 1.2k schools
-					</li>
-					<li>
-						<em>big-ish</em>: 1.5M collisions
-					</li>
-					<li>
-						<em>actually big</em>: 120M traffic volume readings
-					</li>
-					<li>TODO: notes about update rates?</li>
-				</ul>
+      <section data-background-interactive data-map-id="schoolsWat">
+        <h2><span class="highlight">wat</span></h2>
 
-				<aside class="notes">
-					some datasets are fairly small: 1.2k schools and other educational institutions.
-					some are bigger: 1.5M collisions over 40 years.
-					some are really big: 120M traffic volume readings over same time period.
-					"small" and "big" are relative terms, but dictate what you can do.
-				</aside>
-			</section>
+        <aside class="notes">
+          <p>
+            it's a difficult problem!  to motivate that, here's a map of all schools and
+            educational institutions in Toronto.
+          </p>
+          <p>
+            everyone has seen a map like this.  impossible to tell what's going on,
+            and there's only 1200 markers!
+          </p>
+        </aside>
+      </section>
 
-			<section data-background-interactive data-map-id="schoolsWat">
-				<h2><span class="highlight">wat</span></h2>
+      <section data-background-interactive data-map-id="schoolsThatsBetter">
+        <h2><span class="highlight">that's better</span></h2>
 
-				<aside class="notes">
-					<p>
-						it's a difficult problem!  to motivate that, here's a map of all schools and
-						educational institutions in Toronto.
-					</p>
-					<p>
-						everyone has seen a map like this.  impossible to tell what's going on,
-						and there's only 1200 markers!
-					</p>
-				</aside>
-			</section>
+        <aside class="notes">
+          <p>
+            same data, but it makes a lot more sense now.  we're close enough to see spatial
+            relationships, both between points and to other landmarks.  the iconography helps
+            explain what sort of thing we're looking at.  the popups provide more specific detail
+            on individual things.
+          </p>
+          <p>
+            so it's not an impossible problem by any means.
+          </p>
+        </aside>
+      </section>
 
-			<section data-background-interactive data-map-id="schoolsThatsBetter">
-				<h2><span class="highlight">that's better</span></h2>
+      <section>
+        <h2>important questions</h2>
+        <ul>
+          <li>how can we <em>render</em> this much data?</li>
+          <li>how can we <em>understand</em> this much data?</li>
+          <li>how can we <em>process</em> this much data?</li>
+        </ul>
 
-				<aside class="notes">
-					<p>
-						same data, but it makes a lot more sense now.  we're close enough to see spatial
-						relationships, both between points and to other landmarks.  the iconography helps
-						explain what sort of thing we're looking at.  the popups provide more specific detail
-						on individual things.
-					</p>
-					<p>
-						so it's not an impossible problem by any means.
-					</p>
-				</aside>
-			</section>
-
-			<section>
-				<h2>important questions</h2>
-				<ul>
-					<li>how can we <em>render</em> this much data?</li>
-					<li>how can we <em>understand</em> this much data?</li>
-					<li>how can we <em>process</em> this much data?</li>
-				</ul>
-
-				<aside class="notes">
-					going to focus on three important questions.  to handle larger datasets on maps, we
-					have to be able to render a lot of data at once.  to understand the data, we need to
-					make careful use of progressive disclosure techniques like aggregation and cluster
-				</aside>
-			</section>
+        <aside class="notes">
+          going to focus on three important questions.  to handle larger datasets on maps, we
+          have to be able to render a lot of data at once.  to understand the data, we need to
+          make careful use of progressive disclosure techniques like aggregation and cluster
+        </aside>
+      </section>
 
       <section data-background-color="#ee0000">
-				<h2>rendering</h2>
-				<ul>
-					<li>how can we <em>render</em> this much data?</li>
-					<li class="fade">how can we <em>understand</em> this much data?</li>
-					<li class="fade">how can we <em>process</em> this much data?</li>
-				</ul>
+        <h2>rendering</h2>
+        <ul>
+          <li>how can we <em>render</em> this much data?</li>
+          <li class="fade">how can we <em>understand</em> this much data?</li>
+          <li class="fade">how can we <em>process</em> this much data?</li>
+        </ul>
 
-				<aside class="notes">
-					let's start with rendering.
-				</aside>
-			</section>
+        <aside class="notes">
+          let's start with rendering.
+        </aside>
+      </section>
 
-			<section data-background-interactive data-map-id="helloWorld">
-				<h2><span class="highlight">hello, world!</span></h2>
+      <section data-background-interactive data-map-id="helloWorld">
+        <h2><span class="highlight">hello, world!</span></h2>
 
-				<aside class="notes">
-					to render data in MOVE, we use a library called Mapbox GL.
-					it's not the only mapping library out there: there's other open-source libraries like
-					Leaflet and OpenLayers.  that said, it has a number of features that make our lives
-					much easier, as we'll see throughout this presentation.
-				</aside>
-			</section>
+        <aside class="notes">
+          to render data in MOVE, we use a library called Mapbox GL.
+          it's not the only mapping library out there: there's other open-source libraries like
+          Leaflet and OpenLayers.  that said, it has a number of features that make our lives
+          much easier, as we'll see throughout this presentation.
+        </aside>
+      </section>
 
-			<section>
-				<h2>hello, Mapbox GL!</h2>
+      <section>
+        <h2>hello, Mapbox GL!</h2>
 
-				<pre>
-					<code data-line-numbers="1-2|3-10|11" data-trim>
+        <pre>
+          <code data-line-numbers="1-2|3-10|11" data-trim>
 /* const basemapStyle = ... */
 /* const $mapContainer = ... */
 const options = {
   container: $mapContainer,
   dragRotate: false,
+  keyboard: false,
   pitchWithRotate: false,
   renderWorldCopies: true,
-  keyboard: false,
   style: basemapStyle,
 };
 const map = new mapboxgl.Map(options);
-					</code>
-				</pre>
+          </code>
+        </pre>
 
-				<aside class="notes">
-				</aside>
-			</section>
-
-			<section data-background-interactive data-map-id="helloToronto">
-				<h2><span class="highlight">hello, Toronto!</span></h2>
-
-				<aside class="notes">
-				</aside>
+        <aside class="notes">
+        </aside>
       </section>
 
-			<section>
+      <section>
         <h2>how to put Toronto at the center of the universe</h2>
 
-				<pre>
-					<code data-line-numbers data-trim>
-/* TODO: show options to zoom into Toronto */
-					</code>
-				</pre>
+        <pre>
+          <code data-line-numbers="1-4,7-8|9-10,12" data-trim>
+const BOUNDS_TORONTO = new mapboxgl.LngLatBounds(
+  new mapboxgl.LngLat(-79.639264937, 43.580995995),
+  new mapboxgl.LngLat(-79.115243191, 43.855457183),
+);
+const optionsToronto = {
+  ...options,
+  center: BOUNDS_TORONTO.getCenter(),
+  maxBounds: BOUNDS_TORONTO,
+  maxZoom: 19,
+  minZoom: 10,
+  renderWorldCopies: false,
+  zoom: 10,
+};
+          </code>
+        </pre>
 
-				<aside class="notes">
-				</aside>
+        <aside class="notes">
+        </aside>
+      </section>
+
+      <section data-background-interactive data-map-id="helloToronto">
+        <h2><span class="highlight">hello, Toronto!</span></h2>
+
+        <aside class="notes">
+        </aside>
       </section>
 
       <section>
-        <h2>getting collisions data</h2>
-        <p>TODO: explain this process</p>
+        <h2>exporting GeoJSON from PostgreSQL</h2>
+        <pre>
+          <code data-line-numbers="2-8|9-17|18-22|1|23" data-trim>
+COPY (
+  WITH features AS (
+    SELECT
+      collision_id AS "id", geom,
+      ksi, cyclist, pedestrian
+    FROM collisions.events
+    WHERE accdate >= now() - interval '3 year'
+  ),
+  geojson_features AS (
+    SELECT jsonb_build_object(
+      'type', 'Feature',
+      'id', id,
+      'geometry', ST_AsGeoJSON(geom)::jsonb,
+      'properties', to_jsonb(features.*) - 'id' - 'geom'
+    ) AS feature
+    FROM features
+  )
+  SELECT jsonb_build_object(
+    'type', 'FeatureCollection',
+    'features', jsonb_agg(feature)
+  ) AS feature_collection
+  FROM geojson_features
+) TO STDOUT WITH (HEADER FALSE);
+          </code>
+        </pre>
 
-				<aside class="notes">
-				</aside>
+        <aside class="notes">
+        </aside>
       </section>
 
       <section>
-        <h2>GeoJSON source</h2>
-        <p>TODO: explain this process</p>
+        <h2>using GeoJSON in Mapbox GL</h2>
+        <pre>
+          <code data-line-numbers data-trim>
+// TODO: this
+          </code>
+        </pre>
 
-				<aside class="notes">
-				</aside>
+        <aside class="notes">
+        </aside>
       </section>
 
-      <section>
-				<h2><span class="highlight">we can do better</span></h2>
-        <p>TODO: map of collisions</p>
+      <section data-background-interactive data-map-id="collisionsPoints">
+        <h2><span class="highlight">we can do better</span></h2>
 
-				<aside class="notes">
+        <aside class="notes">
           <p>
             the result is pretty jarring, and in more ways than one.  first: that's 500k collisions
             over 10 years.  that means 50k per year, 150 per day, 6 per hour.  the vast majority are
@@ -268,14 +286,14 @@ const map = new mapboxgl.Map(options);
             one thing is surprising, though: our browser isn't falling over or locking up!  how is this
             so <em>fast</em>?
           </p>
-				</aside>
+        </aside>
       </section>
 
       <section>
         <h2>tiling</h2>
         <p>TODO: slide with tiling</p>
 
-				<aside class="notes">
+        <aside class="notes">
           <p>
             the answer is tiling!  this is how pretty much every mapping library and service works:
             you divide your data into tiles at different zoom levels.  at each zoom level, you split
@@ -285,7 +303,7 @@ const map = new mapboxgl.Map(options);
             when you load a GeoJSON source, Mapbox GL builds a set of tiles on your data.  this takes
             a bit of time up front (TODO: finish explanation)
           </p>
-				</aside>
+        </aside>
       </section>
 
       <section>
@@ -297,28 +315,28 @@ const map = new mapboxgl.Map(options);
           TODO: now: [raw data -> GeoJSON] -> [vector tiles -> render using layer style -> map]
         </p>
 
-				<aside class="notes">
-				</aside>
+        <aside class="notes">
+        </aside>
       </section>
 
       <section data-background-color="#ee0000">
-				<h2>understanding</h2>
-				<ul>
-					<li class="fade">how can we <em>render</em> this much data?</li>
-					<li>how can we <em>understand</em> this much data?</li>
-					<li class="fade">how can we <em>process</em> this much data?</li>
-				</ul>
+        <h2>understanding</h2>
+        <ul>
+          <li class="fade">how can we <em>render</em> this much data?</li>
+          <li>how can we <em>understand</em> this much data?</li>
+          <li class="fade">how can we <em>process</em> this much data?</li>
+        </ul>
 
-				<aside class="notes">
-				</aside>
+        <aside class="notes">
+        </aside>
       </section>
 
       <section>
-				<h2><span class="highlight">we can do better</span></h2>
+        <h2><span class="highlight">we can do better</span></h2>
         <p>TODO: map of collisions</p>
 
         <aside class="notes">
-				</aside>
+        </aside>
       </section>
 
       <section>
@@ -327,99 +345,99 @@ const map = new mapboxgl.Map(options);
         <p>clustering: Map of the Jugger World</p>
         <p>vis diff: MOVE</p>
 
-				<aside class="notes">
-				</aside>
+        <aside class="notes">
+        </aside>
       </section>
 
       <section>
         <h2><span class="highlight">clustering</span></h2>
         <p>TODO: map with collisions clustered</p>
 
-				<aside class="notes">
+        <aside class="notes">
           group nearby points.  reduces clutter, but loses precision of representation!
-				</aside>
+        </aside>
       </section>
 
-			<section>
+      <section>
         <h2>TODO: clustering explanation</h2>
 
-				<pre>
-					<code data-line-numbers data-trim>
+        <pre>
+          <code data-line-numbers data-trim>
 /* TODO: code */
-					</code>
-				</pre>
+          </code>
+        </pre>
 
-				<aside class="notes">
-				</aside>
+        <aside class="notes">
+        </aside>
       </section>
 
       <section>
         <h2><span class="highlight">heatmaps</span></h2>
         <p>TODO: map with collisions heatmap</p>
 
-				<aside class="notes">
+        <aside class="notes">
           blur points together.  good for visualizing density, but doesn't work so
           well with sparse data.  allows for weighting of points: maybe some are
           more important than others (e.g. KSI)!
-				</aside>
+        </aside>
       </section>
 
-			<section>
+      <section>
         <h2>TODO: heatmap explanation</h2>
 
-				<pre>
-					<code data-line-numbers data-trim>
+        <pre>
+          <code data-line-numbers data-trim>
 /* TODO: code */
-					</code>
-				</pre>
+          </code>
+        </pre>
 
-				<aside class="notes">
-				</aside>
+        <aside class="notes">
+        </aside>
       </section>
 
       <section>
         <h2><span class="highlight">all together now</span></h2>
         <p>TODO: map with collisions heatmap that blends to clusters that blends to points</p>
 
-				<aside class="notes">
+        <aside class="notes">
           using Mapbox GL, we can set "zoom breakpoints" and blend layers together.
           allows us to get the benefits of each at the appropriate zoom level
-				</aside>
+        </aside>
       </section>
 
-			<section>
+      <section>
         <h2>TODO: zoom breakpoints explanation</h2>
 
-				<pre>
-					<code data-line-numbers data-trim>
+        <pre>
+          <code data-line-numbers data-trim>
 /* TODO: code */
-					</code>
-				</pre>
+          </code>
+        </pre>
 
-				<aside class="notes">
-				</aside>
+        <aside class="notes">
+        </aside>
       </section>
 
       <section>
         <h2><span class="highlight">visual differentiation</span></h2>
         <p>TODO: distinguish KSI collisions from non-KSI collisions</p>
 
-				<aside class="notes">
+        <aside class="notes">
           focus attention to more important points: bigger, brighter, visually distinct.
-				</aside>
+        </aside>
       </section>
 
-			<section>
+      <section>
         <h2>TODO: styling for visual differentiation</h2>
 
-				<pre>
-					<code data-line-numbers data-trim>
+        <pre>
+          <code data-line-numbers data-trim>
 /* TODO: code */
-					</code>
-				</pre>
+          </code>
+        </pre>
 
-				<aside class="notes">
-				</aside>
+        <aside class="notes">
+        </aside>
       </section>
 
       <section>
@@ -428,8 +446,8 @@ const map = new mapboxgl.Map(options);
           TODO: [raw data -> GeoJSON] -> [vector tiles -> render using layer style -> map]
         </p>
 
-				<aside class="notes">
-				</aside>
+        <aside class="notes">
+        </aside>
       </section>
 
       <section>
@@ -438,7 +456,7 @@ const map = new mapboxgl.Map(options);
           images TODO: MOVE legend with show / hide toggles; MOVE filter box; SharedStreets
         </p>
 
-				<aside class="notes">
+        <aside class="notes">
           <p>
             hide / show layers: when showing multiple datasets, can help users hide datasets that
             aren't currently relevant to their task.  within datasets, can apply more fine-grained
@@ -450,28 +468,28 @@ const map = new mapboxgl.Map(options);
             of clustering by intersections / segments, which mitigates the clutter / precision tradeoff
             of clustering.  this also allows selection gestures on intersections / segments.
           </p>
-				</aside>
+        </aside>
       </section>
 
       <section data-background-color="#ee0000">
-				<h2>processing</h2>
-				<ul>
-					<li class="fade">how can we <em>render</em> this much data?</li>
-					<li class="fade">how can we <em>understand</em> this much data?</li>
-					<li>how can we <em>process</em> this much data?</li>
-				</ul>
+        <h2>processing</h2>
+        <ul>
+          <li class="fade">how can we <em>render</em> this much data?</li>
+          <li class="fade">how can we <em>understand</em> this much data?</li>
+          <li>how can we <em>process</em> this much data?</li>
+        </ul>
 
-				<aside class="notes">
-				</aside>
+        <aside class="notes">
+        </aside>
       </section>
 
       <section>
         <h2><span class="highlight">we're done, right?</span></h2>
         <p>TODO: distinguish KSI collisions from non-KSI collisions</p>
 
-				<aside class="notes">
+        <aside class="notes">
           if you can load the whole dataset at once, GeoJSON layers actually work quite well!
-				</aside>
+        </aside>
       </section>
 
       <section>
@@ -480,11 +498,11 @@ const map = new mapboxgl.Map(options);
           images TODO: gif of network tab loading collisions data
         </p>
 
-				<aside class="notes">
+        <aside class="notes">
           what if you can't, though?  I can get away with loading a (TODO: size) file here,
           because the file is on my computer and you're just watching my screen anyways.
           in a production web application, though, this wouldn't fly.
-				</aside>
+        </aside>
       </section>
 
       <section>
@@ -493,8 +511,8 @@ const map = new mapboxgl.Map(options);
           TODO: [raw data -> GeoJSON -> vector tiles] -> [render using layer style -> map]
         </p>
 
-				<aside class="notes">
-				</aside>
+        <aside class="notes">
+        </aside>
       </section>
 
       <section>
@@ -503,10 +521,10 @@ const map = new mapboxgl.Map(options);
           TODO: ST_AsGeoJSON, tippecanoe command examples
         </p>
 
-				<aside class="notes">
+        <aside class="notes">
           great for absolutely massive datasets!  lots of options for simplifying and
           culling features to reduce tileset size.
-				</aside>
+        </aside>
       </section>
 
       <section>
@@ -518,11 +536,11 @@ const map = new mapboxgl.Map(options);
           TODO: link to mbtiles-server
         </p>
 
-				<aside class="notes">
+        <aside class="notes">
           tippecanoe's output is an MBTiles archive.  this is just a sqlite database that
           maps (z, x, y) tile coordinates to tile data.  there are tools like mbtiles-server
           that allow you to quickly spin up a server for this archive.
-				</aside>
+        </aside>
       </section>
 
       <section>
@@ -531,10 +549,10 @@ const map = new mapboxgl.Map(options);
           TODO: mbutil command, and output
         </p>
 
-				<aside class="notes">
+        <aside class="notes">
           you can use mbutil to store the tiles as static files!  great for deploying to
           a variety of on-prem and cloud environments.
-				</aside>
+        </aside>
       </section>
 
       <section>
@@ -543,13 +561,13 @@ const map = new mapboxgl.Map(options);
           TODO: ST_AsMVT example
         </p>
 
-				<aside class="notes">
+        <aside class="notes">
           great for quick prototyping of new vector tile sources on big datasets!
           great for high zoom level tiles!  slow for tiles containing lots of features
-				</aside>
+        </aside>
       </section>
-		</div>
-	</div>
+    </div>
+  </div>
 <!-- END OF SLIDES -->
 
 <script src="js/reveal.js"></script>
@@ -561,20 +579,27 @@ const BOUNDS_TORONTO = new mapboxgl.LngLatBounds(
 );
 
 let basemapStyle = null;
+let collisions = null;
 let map = null;
 let schools = null;
 
 async function getJson(url) {
-	const response = await fetch(url);
-	return response.json();
+  const response = await fetch(url);
+  return response.json();
 }
 
 async function initMapbox() {
-	const [metadata, root, schoolsData] = await Promise.all([
-		getJson('data/metadata.json'),
-		getJson('data/root.json'),
-		getJson('data/schools.geojson'),
-	]);
+  const [
+    collisionsData,
+    metadata,
+    root,
+    schoolsData,
+  ] = await Promise.all([
+    getJson('data/collisions.geojson'),
+    getJson('data/metadata.json'),
+    getJson('data/root.json'),
+    getJson('data/schools.geojson'),
+  ]);
 
   basemapStyle = JSON.parse(JSON.stringify(root));
   basemapStyle.sources.esri = {
@@ -588,157 +613,185 @@ async function initMapbox() {
     ],
     description: metadata.description || '',
     name: metadata.name,
-	};
+  };
 
-	schools = schoolsData;
+  collisions = collisionsData;
+  schools = schoolsData;
 }
 
 class MapOptions {
-	// HELPERS
+  // HELPERS
 
-	static _common() {
-		return {
-			dragRotate: false,
-			pitchWithRotate: false,
-			renderWorldCopies: true,
-			keyboard: false,
-			style: basemapStyle,
-		};
-	}
+  static _common() {
+    return {
+      dragRotate: false,
+      keyboard: false,
+      pitchWithRotate: false,
+      renderWorldCopies: true,
+      style: basemapStyle,
+    };
+  }
 
-	static _commonToronto() {
-		const bounds = BOUNDS_TORONTO;
-		return {
-			...MapOptions._common(),
-			center: BOUNDS_TORONTO.getCenter(),
-			maxBounds: bounds,
-			minZoom: 10,
-			maxZoom: 19,
-			renderWorldCopies: false,
-			zoom: 10,
-		};
-	}
+  static _commonToronto() {
+    return {
+      ...MapOptions._common(),
+      center: BOUNDS_TORONTO.getCenter(),
+      maxBounds: BOUNDS_TORONTO,
+      maxZoom: 19,
+      minZoom: 10,
+      renderWorldCopies: false,
+      zoom: 10,
+    };
+  }
 
-	static get(mapId) {
-		return MapOptions[mapId]();
-	}
+  static get(mapId) {
+    return MapOptions[mapId]();
+  }
 
-	static getContainer() {
-		const $reveal = Reveal.getRevealElement();
-		const i = Reveal.getSlidePastCount() + 1;
-		const selector = `.slide-background:nth-child(${i}) > .slide-background-content`;
-		return $reveal.querySelector(selector);
-	}
+  static getContainer() {
+    const $reveal = Reveal.getRevealElement();
+    const i = Reveal.getSlidePastCount() + 1;
+    const selector = `.slide-background:nth-child(${i}) > .slide-background-content`;
+    return $reveal.querySelector(selector);
+  }
 
-	// MAP FUNCTIONS
+  // MAP FUNCTIONS
 
-	static helloToronto() {
-		return MapOptions._commonToronto();
-	}
+  static collisionsPoints() {
+    return MapOptions._commonToronto();
+  }
 
-	static helloWorld() {
-		return MapOptions._common();
-	}
+  static helloToronto() {
+    return MapOptions._commonToronto();
+  }
 
-	static schoolsThatsBetter() {
-		return {
-			...MapOptions._commonToronto(),
-			zoom: 14,
-		};
-	}
+  static helloWorld() {
+    return MapOptions._common();
+  }
 
-	static schoolsWat() {
-		return MapOptions._commonToronto();
-	}
+  static schoolsThatsBetter() {
+    return {
+      ...MapOptions._commonToronto(),
+      zoom: 14,
+    };
+  }
+
+  static schoolsWat() {
+    return MapOptions._commonToronto();
+  }
 }
 
 class MapInit {
-	// HELPERS
+  // HELPERS
 
-	static init(mapId, map) {
-		return MapInit[mapId](map);
-	}
+  static init(mapId, map) {
+    return MapInit[mapId](map);
+  }
 
-	// MAP FUNCTIONS
+  // MAP FUNCTIONS
 
-	static helloToronto(map) {}
+  static collisionsPoints(map) {
+    const COLOR_COLLISION_FILL = '#ef4848';
+    const COLOR_COLLISION_STROKE = '#773333';
 
-	static helloWorld(map) {}
+    map.addSource('collisionsPoints', {
+      buffer: 0,
+      type: 'geojson',
+      data: collisions,
+    });
+    map.addLayer({
+      id: 'collisionsPoints',
+      source: 'collisionsPoints',
+      type: 'circle',
+      minzoom: 10,
+      maxzoom: 19,
+      paint: {
+        'circle-color': COLOR_COLLISION_FILL,
+        'circle-radius': 6.5,
+        'circle-stroke-color': COLOR_COLLISION_STROKE,
+        'circle-stroke-width': 1,
+      },
+    });
+  }
 
-	static schoolsThatsBetter(map) {
-		let popup = null;
+  static helloToronto(map) {}
 
-		schools.features.forEach((feature) => {
-			var $marker = document.createElement('div');
-  		$marker.className = 'move-marker';
-			const marker = new mapboxgl.Marker($marker)
-				.setLngLat(feature.geometry.coordinates)
-				.addTo(map);
+  static helloWorld(map) {}
 
-			$marker.addEventListener('click', function() {
-				if (popup !== null) {
-					popup.remove();
-				}
-				popup = new mapboxgl.Popup({ offset: 20 })
-					.setText(feature.properties.NAME);
-				marker.setPopup(popup);
-			});
-		});
-	}
+  static schoolsThatsBetter(map) {
+    let popup = null;
 
-	static schoolsWat(map) {
-		schools.features.forEach((feature) => {
-			new mapboxgl.Marker()
-				.setLngLat(feature.geometry.coordinates)
-				.addTo(map);
-		});
-	}
+    schools.features.forEach((feature) => {
+      var $marker = document.createElement('div');
+      $marker.className = 'move-marker';
+      const marker = new mapboxgl.Marker($marker)
+        .setLngLat(feature.geometry.coordinates)
+        .addTo(map);
+
+      $marker.addEventListener('click', function() {
+        if (popup !== null) {
+          popup.remove();
+        }
+        popup = new mapboxgl.Popup({ offset: 20 })
+          .setText(feature.properties.NAME);
+        marker.setPopup(popup);
+      });
+    });
+  }
+
+  static schoolsWat(map) {
+    schools.features.forEach((feature) => {
+      new mapboxgl.Marker()
+        .setLngLat(feature.geometry.coordinates)
+        .addTo(map);
+    });
+  }
 }
 
 function removeMap() {
-	if (map !== null) {
-		map.remove();
-		map = null;
-	}
+  if (map !== null) {
+    map.remove();
+    map = null;
+  }
 }
 
 function loadMap() {
-	const $currentSlide = Reveal.getCurrentSlide();
-	const { mapId } = $currentSlide.dataset;
-	if (mapId !== undefined) {
-		const $mapContainer = MapOptions.getContainer();
-		const options = MapOptions.get(mapId);
+  const $currentSlide = Reveal.getCurrentSlide();
+  const { mapId } = $currentSlide.dataset;
+  if (mapId !== undefined) {
+    const $mapContainer = MapOptions.getContainer();
+    const options = MapOptions.get(mapId);
 
-		console.log(mapId, options);
-		map = new mapboxgl.Map({
-			container: $mapContainer,
-			...options,
-		});
-		MapInit.init(mapId, map);
-	}
+    console.log(mapId, options);
+    map = new mapboxgl.Map({
+      container: $mapContainer,
+      ...options,
+    });
+    map.on('load', () => MapInit.init(mapId, map));
+  }
 }
 
 function initReveal() {
-	Reveal.initialize({
-		center: false,
-		hash: true,
-		dependencies: [
-			{ src: 'plugin/highlight/highlight.js' },
-			{ src: 'plugin/notes/notes.js', async: true }
-		]
-	});
+  Reveal.initialize({
+    center: false,
+    hash: true,
+    dependencies: [
+      { src: 'plugin/highlight/highlight.js' },
+      { src: 'plugin/notes/notes.js', async: true }
+    ]
+  });
 
-	Reveal.addEventListener('slidechanged', function(evt) {
-		removeMap();
-		loadMap();
-	});
-	Reveal.addEventListener('overviewshown', removeMap);
-	Reveal.addEventListener('overviewhidden', loadMap);
+  Reveal.addEventListener('slidechanged', function(evt) {
+    removeMap();
+    loadMap();
+  });
+  Reveal.addEventListener('overviewshown', removeMap);
+  Reveal.addEventListener('overviewhidden', loadMap);
 }
 
 async function main() {
-	await initMapbox();
-	initReveal();
+  await initMapbox();
+  initReveal();
 }
 
 main();
