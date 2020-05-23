@@ -31,6 +31,21 @@ img.about-me {
 .fade {
 	opacity: 0.3;
 }
+
+.move-marker {
+	background-image: url('img/school.png');
+  background-size: cover;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.mapboxgl-popup-content {
+	color: black;
+	font-size: 1.5rem;
+	line-height: 1.8rem;
+}
 </style>
 </head>
 <body>
@@ -120,9 +135,8 @@ img.about-me {
 				</aside>
 			</section>
 
-			<section>
+			<section data-background-interactive data-map-id="schoolsThatsBetter">
 				<h2><span class="highlight">that's better</span></h2>
-				<p>TODO: same map as previous slide, but zoomed in, with school icons, and with popups</p>
 
 				<aside class="notes">
 					same data, but it makes a lot more sense now.  we're close enough to see spatial
@@ -588,14 +602,12 @@ class MapOptions {
 		const bounds = BOUNDS_TORONTO;
 		return {
 			...MapOptions._common(),
-			bounds,
-			fitBoundsOptions: {
-				offset: [0, -64],
-			},
+			center: BOUNDS_TORONTO.getCenter(),
 			maxBounds: bounds,
 			minZoom: 10,
 			maxZoom: 19,
 			renderWorldCopies: false,
+			zoom: 10,
 		};
 	}
 
@@ -620,6 +632,13 @@ class MapOptions {
 		return MapOptions._common();
 	}
 
+	static schoolsThatsBetter() {
+		return {
+			...MapOptions._commonToronto(),
+			zoom: 14,
+		};
+	}
+
 	static schoolsWat() {
 		return MapOptions._commonToronto();
 	}
@@ -637,6 +656,27 @@ class MapInit {
 	static helloToronto(map) {}
 
 	static helloWorld(map) {}
+
+	static schoolsThatsBetter(map) {
+		let popup = null;
+
+		schools.features.forEach((feature) => {
+			var $marker = document.createElement('div');
+  		$marker.className = 'move-marker';
+			const marker = new mapboxgl.Marker($marker)
+				.setLngLat(feature.geometry.coordinates)
+				.addTo(map);
+
+			$marker.addEventListener('click', function() {
+				if (popup !== null) {
+					popup.remove();
+				}
+				popup = new mapboxgl.Popup({ offset: 20 })
+					.setText(feature.properties.NAME);
+				marker.setPopup(popup);
+			});
+		});
+	}
 
 	static schoolsWat(map) {
 		schools.features.forEach((feature) => {
@@ -657,11 +697,11 @@ function removeMap() {
 function loadMap() {
 	const $currentSlide = Reveal.getCurrentSlide();
 	const { mapId } = $currentSlide.dataset;
-	console.log(mapId);
 	if (mapId !== undefined) {
 		const $mapContainer = MapOptions.getContainer();
 		const options = MapOptions.get(mapId);
-		console.log(options);
+
+		console.log(mapId, options);
 		map = new mapboxgl.Map({
 			container: $mapContainer,
 			...options,
