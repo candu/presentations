@@ -110,9 +110,8 @@ img.about-me {
 				</aside>
 			</section>
 
-			<section>
+			<section data-background-interactive data-map-id="schoolsWat">
 				<h2><span class="highlight">wat</span></h2>
-				<p>TODO: map of all schools at zoom level 10, shown as markers</p>
 
 				<aside class="notes">
 					from human perspective, even "small" in this breakdown is "big".
@@ -539,8 +538,9 @@ const BOUNDS_TORONTO = new mapboxgl.LngLatBounds(
   new mapboxgl.LngLat(-79.115243191, 43.855457183),
 );
 
-let map = null;
 let basemapStyle = null;
+let map = null;
+let schools = null;
 
 async function getJson(url) {
 	const response = await fetch(url);
@@ -548,10 +548,12 @@ async function getJson(url) {
 }
 
 async function initMapbox() {
-	const [root, metadata] = await Promise.all([
-		getJson('data/root.json'),
+	const [metadata, root, schoolsData] = await Promise.all([
 		getJson('data/metadata.json'),
+		getJson('data/root.json'),
+		getJson('data/schools.geojson'),
 	]);
+
   basemapStyle = JSON.parse(JSON.stringify(root));
   basemapStyle.sources.esri = {
     type: 'vector',
@@ -564,10 +566,14 @@ async function initMapbox() {
     ],
     description: metadata.description || '',
     name: metadata.name,
-  };
+	};
+
+	schools = schoolsData;
 }
 
 class MapOptions {
+	// HELPERS
+
 	static _common() {
 		return {
 			dragRotate: false,
@@ -604,12 +610,40 @@ class MapOptions {
 		return $reveal.querySelector(selector);
 	}
 
+	// MAP FUNCTIONS
+
 	static helloToronto() {
 		return MapOptions._commonToronto();
 	}
 
 	static helloWorld() {
 		return MapOptions._common();
+	}
+
+	static schoolsWat() {
+		return MapOptions._commonToronto();
+	}
+}
+
+class MapInit {
+	// HELPERS
+
+	static init(mapId, map) {
+		return MapInit[mapId](map);
+	}
+
+	// MAP FUNCTIONS
+
+	static helloToronto(map) {}
+
+	static helloWorld(map) {}
+
+	static schoolsWat(map) {
+		schools.features.forEach((feature) => {
+			new mapboxgl.Marker()
+				.setLngLat(feature.geometry.coordinates)
+				.addTo(map);
+		});
 	}
 }
 
@@ -632,6 +666,7 @@ function loadMap() {
 			container: $mapContainer,
 			...options,
 		});
+		MapInit.init(mapId, map);
 	}
 }
 
