@@ -369,9 +369,8 @@ COPY (
         </aside>
       </section>
 
-      <section>
+      <section data-background-interactive data-map-id="collisionsHeatmap">
         <h2><span class="highlight">heatmaps</span></h2>
-        <p>TODO: map with collisions heatmap</p>
 
         <aside class="notes">
           blur points together.  good for visualizing density, but doesn't work so
@@ -575,6 +574,8 @@ const BOUNDS_TORONTO = new mapboxgl.LngLatBounds(
   new mapboxgl.LngLat(-79.639264937, 43.580995995),
   new mapboxgl.LngLat(-79.115243191, 43.855457183),
 );
+const COLOR_COLLISION_HEATMAP_ZERO = 'rgba(244, 227, 219, 0)';
+const COLOR_COLLISION_HEATMAP_HALF = '#f39268';
 const COLOR_COLLISION_FILL = '#ef4848';
 const COLOR_COLLISION_STROKE = '#773333';
 const ZOOM_LEVEL_3 = 10;
@@ -658,6 +659,10 @@ class MapOptions {
   // MAP FUNCTIONS
 
   static collisionsClustered() {
+    return MapOptions._commonToronto();
+  }
+
+  static collisionsHeatmap() {
     return MapOptions._commonToronto();
   }
 
@@ -751,6 +756,50 @@ class MapInit {
         'circle-radius': 4,
         'circle-stroke-color': COLOR_COLLISION_STROKE,
         'circle-stroke-width': 1,
+      },
+    });
+  }
+
+  static collisionsHeatmap(map) {
+    map.addSource('collisions', {
+      type: 'geojson',
+      data: 'data/collisions.geojson',
+      buffer: 0,
+    });
+    map.addLayer({
+      id: 'collisionsHeatmap',
+      source: 'collisions',
+      type: 'heatmap',
+      minzoom: ZOOM_LEVEL_3,
+      maxzoom: ZOOM_LEVEL_0,
+      paint: {
+        'heatmap-color': [
+          'interpolate',
+          ['linear'],
+          ['heatmap-density'],
+          0, COLOR_COLLISION_HEATMAP_ZERO,
+          0.5, COLOR_COLLISION_HEATMAP_HALF,
+          1, COLOR_COLLISION_FILL,
+        ],
+        'heatmap-intensity': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          ZOOM_LEVEL_3, 0.33,
+          ZOOM_LEVEL_2, 1,
+        ],
+        'heatmap-radius': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          ZOOM_LEVEL_3, 5,
+          ZOOM_LEVEL_2, 10,
+        ],
+        'heatmap-weight': [
+          'case',
+          ['get', 'ksi'], 3,
+          0.03,
+        ],
       },
     });
   }
