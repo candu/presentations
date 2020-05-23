@@ -80,25 +80,19 @@ img.about-me {
 
 			<section>
 				<h2>civic data &#x2665; maps</h2>
-				<p>TODO: images of maps that use open data</p>
+				<img src="img/torontocivictransportation1915.jpg">
 
 				<aside class="notes">
-					when we talk about the sort of data that governments and civic organizations make use of,
-					a lot of it is geospatial: you can and often should put it on a map.
-					(TODO: examples)
-					a lot of the work we do on MOVE involves taking these civic datasets and carefully processing
-					them so that we can show them on a map.
-				</aside>
-			</section>
-
-			<section data-background-interactive data-map-id="helloWorld">
-				<h2><span class="highlight">Mapbox GL</span></h2>
-
-				<aside class="notes">
-					for the mapping part of that, we use Mapbox GL.  it's not the only mapping library out there:
-					there's other open-source libraries like Leaflet and OpenLayers.  web mapping is also not the
-					only approach: for instance, many people use ArcGIS or its open-source counterpart QGIS to work
-					with geospatial data.
+					<p>
+						when we talk about the sort of data that governments and civic organizations make use of,
+						a lot of it is geospatial: you can and often should put it on a map.  that's always been
+						true, as you can see here in this 1915 map exploring how people get around Toronto.
+					</p>
+					<p>
+						so the problem's not new, but we do have both larger datasets and better tools for working
+						with those datasets.  a lot of the work we do on MOVE fits this mould: what are the best tools
+						right now for rendering, understanding, and processing geospatial datasets?
+					</p>
 				</aside>
 			</section>
 
@@ -129,9 +123,14 @@ img.about-me {
 				<h2><span class="highlight">wat</span></h2>
 
 				<aside class="notes">
-					from human perspective, even "small" in this breakdown is "big".
-					everyone has seen a map like this.  impossible to tell what's going on,
-					and there's only 1.2k markers!
+					<p>
+						it's a difficult problem!  to motivate that, here's a map of all schools and
+						educational institutions in Toronto.
+					</p>
+					<p>
+						everyone has seen a map like this.  impossible to tell what's going on,
+						and there's only 1200 markers!
+					</p>
 				</aside>
 			</section>
 
@@ -139,10 +138,15 @@ img.about-me {
 				<h2><span class="highlight">that's better</span></h2>
 
 				<aside class="notes">
-					same data, but it makes a lot more sense now.  we're close enough to see spatial
-					relationships, both between points and to other landmarks.  the iconography helps
-					explain what sort of thing we're looking at.  the popups provide more specific detail
-					on individual things.
+					<p>
+						same data, but it makes a lot more sense now.  we're close enough to see spatial
+						relationships, both between points and to other landmarks.  the iconography helps
+						explain what sort of thing we're looking at.  the popups provide more specific detail
+						on individual things.
+					</p>
+					<p>
+						so it's not an impossible problem by any means.
+					</p>
 				</aside>
 			</section>
 
@@ -170,7 +174,7 @@ img.about-me {
 				</ul>
 
 				<aside class="notes">
-					let's start with rendering.  this is
+					let's start with rendering.
 				</aside>
 			</section>
 
@@ -178,6 +182,10 @@ img.about-me {
 				<h2><span class="highlight">hello, world!</span></h2>
 
 				<aside class="notes">
+					to render data in MOVE, we use a library called Mapbox GL.
+					it's not the only mapping library out there: there's other open-source libraries like
+					Leaflet and OpenLayers.  that said, it has a number of features that make our lives
+					much easier, as we'll see throughout this presentation.
 				</aside>
 			</section>
 
