@@ -394,7 +394,6 @@ COPY (
 
       <section data-background-interactive data-map-id="collisionsAllTogetherNow">
         <h2><span class="highlight">all together now</span></h2>
-        <p>TODO: map with collisions heatmap that blends to clusters</p>
 
         <aside class="notes">
           using Mapbox GL, we can set "zoom breakpoints" and blend layers together.
@@ -415,9 +414,8 @@ COPY (
         </aside>
       </section>
 
-      <section>
+      <section data-background-interactive data-map-id="collisionsVisualDiff">
         <h2><span class="highlight">visual differentiation</span></h2>
-        <p>TODO: distinguish KSI collisions from non-KSI collisions</p>
 
         <aside class="notes">
           focus attention to more important points: bigger, brighter, visually distinct.
@@ -674,6 +672,15 @@ class MapOptions {
     return MapOptions._commonToronto();
   }
 
+  static collisionsVisualDiff() {
+    return {
+      ...MapOptions._commonToronto(),
+      maxZoom: ZOOM_LEVEL_0,
+      minZoom: ZOOM_LEVEL_2,
+      zoom: ZOOM_LEVEL_2,
+    };
+  }
+
   static helloToronto() {
     return MapOptions._commonToronto();
   }
@@ -685,7 +692,7 @@ class MapOptions {
   static schoolsThatsBetter() {
     return {
       ...MapOptions._commonToronto(),
-      zoom: 14,
+      zoom: ZOOM_LEVEL_2,
     };
   }
 
@@ -954,6 +961,106 @@ class MapInit {
       paint: {
         'circle-color': COLOR_COLLISION_FILL,
         'circle-radius': 6.5,
+        'circle-stroke-color': COLOR_COLLISION_STROKE,
+        'circle-stroke-width': 1,
+      },
+    });
+  }
+
+  static collisionsVisualDiff() {
+    map.addSource('collisionsClustered', {
+      type: 'geojson',
+      data: 'data/collisions.geojson',
+      cluster: true,
+      clusterMaxZoom: ZOOM_LEVEL_0,
+      clusterProperties: {
+        ksiAny: ['any', ['get', 'ksi']],
+      },
+      clusterRadius: 30,
+    });
+    map.addLayer({
+      id: 'collisionsClustered',
+      source: 'collisionsClustered',
+      type: 'circle',
+      minzoom: ZOOM_LEVEL_2,
+      maxzoom: ZOOM_LEVEL_0,
+      filter: ['has', 'point_count'],
+      paint: {
+        'circle-color': [
+          'case',
+          ['get', 'ksiAny'], '#272727',
+          COLOR_COLLISION_FILL,
+        ],
+        'circle-radius': [
+          '*',
+          [
+            'case',
+            ['get', 'ksiAny'], 1.25,
+            1,
+          ],
+          [
+            'step',
+            ['get', 'point_count'],
+            8,
+            10, 10,
+            100, 14,
+            1000, 16,
+          ],
+        ],
+        'circle-stroke-color': [
+          'case',
+          ['get', 'ksiAny'], '#fff',
+          COLOR_COLLISION_STROKE,
+        ],
+        'circle-stroke-width': [
+          'case',
+          ['get', 'ksiAny'], 2,
+          1,
+        ],
+      },
+    });
+    map.addLayer({
+      id: 'collisionsClusteredCount',
+      source: 'collisionsClustered',
+      type: 'symbol',
+      minzoom: ZOOM_LEVEL_2,
+      maxzoom: ZOOM_LEVEL_0,
+      filter: [
+        'all',
+        ['has', 'point_count'],
+        ['!', ['get', 'ksiAny']],
+      ],
+      layout: {
+        'text-field': '{point_count_abbreviated}',
+        'text-font': [
+          'case',
+          ['get', 'ksiAny'], ['literal', ['Ubuntu Bold']],
+          ['literal', ['Ubuntu Regular']],
+        ],
+        'text-size': 12
+      },
+      paint: {
+        'text-color': [
+          'case',
+          ['get', 'ksiAny'], '#fff',
+          COLOR_COLLISION_STROKE,
+        ],
+      }
+    });
+    map.addLayer({
+      id: 'collisionsUnclustered',
+      source: 'collisionsClustered',
+      type: 'circle',
+      minzoom: ZOOM_LEVEL_2,
+      maxzoom: ZOOM_LEVEL_0,
+      filter: ['!', ['has', 'point_count']],
+      paint: {
+        'circle-color': [
+          'case',
+          ['get', 'ksi'], COLOR_COLLISION_STROKE,
+          COLOR_COLLISION_FILL
+        ],
+        'circle-radius': 4,
         'circle-stroke-color': COLOR_COLLISION_STROKE,
         'circle-stroke-width': 1,
       },
