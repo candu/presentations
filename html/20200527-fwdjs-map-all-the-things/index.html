@@ -1025,11 +1025,7 @@ class MapInit {
       type: 'symbol',
       minzoom: ZOOM_LEVEL_2,
       maxzoom: ZOOM_LEVEL_0,
-      filter: [
-        'all',
-        ['has', 'point_count'],
-        ['!', ['get', 'ksiAny']],
-      ],
+      filter: ['has', 'point_count'],
       layout: {
         'text-field': '{point_count_abbreviated}',
         'text-font': [
@@ -1057,12 +1053,29 @@ class MapInit {
       paint: {
         'circle-color': [
           'case',
-          ['get', 'ksi'], COLOR_COLLISION_STROKE,
-          COLOR_COLLISION_FILL
+          ['get', 'ksi'], '#272727',
+          COLOR_COLLISION_FILL,
         ],
-        'circle-radius': 4,
-        'circle-stroke-color': COLOR_COLLISION_STROKE,
-        'circle-stroke-width': 1,
+        'circle-radius': [
+          'case',
+          ['get', 'ksi'], 6,
+          4,
+        ],
+        'circle-sort-key': [
+          'case',
+          ['get', 'ksi'], 1,
+          0,
+        ],
+        'circle-stroke-color': [
+          'case',
+          ['get', 'ksi'], '#fff',
+          COLOR_COLLISION_STROKE,
+        ],
+        'circle-stroke-width': [
+          'case',
+          ['get', 'ksiAny'], 2,
+          1,
+        ],
       },
     });
   }
