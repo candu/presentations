@@ -331,9 +331,8 @@ COPY (
         </aside>
       </section>
 
-      <section>
+      <section data-background-interactive data-map-id="collisionsPoints">
         <h2><span class="highlight">we can do better</span></h2>
-        <p>TODO: map of collisions</p>
 
         <aside class="notes">
         </aside>
@@ -349,9 +348,8 @@ COPY (
         </aside>
       </section>
 
-      <section>
+      <section data-background-interactive data-map-id="collisionsClustered">
         <h2><span class="highlight">clustering</span></h2>
-        <p>TODO: map with collisions clustered</p>
 
         <aside class="notes">
           group nearby points.  reduces clutter, but loses precision of representation!
@@ -577,9 +575,14 @@ const BOUNDS_TORONTO = new mapboxgl.LngLatBounds(
   new mapboxgl.LngLat(-79.639264937, 43.580995995),
   new mapboxgl.LngLat(-79.115243191, 43.855457183),
 );
+const COLOR_COLLISION_FILL = '#ef4848';
+const COLOR_COLLISION_STROKE = '#773333';
+const ZOOM_LEVEL_3 = 10;
+const ZOOM_LEVEL_2 = 14;
+const ZOOM_LEVEL_1 = 17;
+const ZOOM_LEVEL_0 = 19;
 
 let basemapStyle = null;
-let collisions = null;
 let map = null;
 let schools = null;
 
@@ -590,12 +593,10 @@ async function getJson(url) {
 
 async function initMapbox() {
   const [
-    collisionsData,
     metadata,
     root,
     schoolsData,
   ] = await Promise.all([
-    getJson('data/collisions.geojson'),
     getJson('data/metadata.json'),
     getJson('data/root.json'),
     getJson('data/schools.geojson'),
@@ -615,7 +616,6 @@ async function initMapbox() {
     name: metadata.name,
   };
 
-  collisions = collisionsData;
   schools = schoolsData;
 }
 
@@ -637,10 +637,10 @@ class MapOptions {
       ...MapOptions._common(),
       center: BOUNDS_TORONTO.getCenter(),
       maxBounds: BOUNDS_TORONTO,
-      maxZoom: 19,
-      minZoom: 10,
+      maxZoom: ZOOM_LEVEL_0,
+      minZoom: ZOOM_LEVEL_3,
       renderWorldCopies: false,
-      zoom: 10,
+      zoom: ZOOM_LEVEL_3,
     };
   }
 
@@ -656,6 +656,10 @@ class MapOptions {
   }
 
   // MAP FUNCTIONS
+
+  static collisionsClustered() {
+    return MapOptions._commonToronto();
+  }
 
   static collisionsPoints() {
     return MapOptions._commonToronto();
@@ -690,21 +694,79 @@ class MapInit {
 
   // MAP FUNCTIONS
 
-  static collisionsPoints(map) {
-    const COLOR_COLLISION_FILL = '#ef4848';
-    const COLOR_COLLISION_STROKE = '#773333';
-
-    map.addSource('collisionsPoints', {
-      buffer: 0,
+  static collisionsClustered(map) {
+    map.addSource('collisionsClustered', {
       type: 'geojson',
-      data: collisions,
+      data: 'data/collisions.geojson',
+      cluster: true,
+      clusterMaxZoom: ZOOM_LEVEL_0,
+      clusterRadius: 30,
+    });
+    map.addLayer({
+      id: 'collisionsClustered',
+      source: 'collisionsClustered',
+      type: 'circle',
+      minzoom: ZOOM_LEVEL_3,
+      maxzoom: ZOOM_LEVEL_0,
+      filter: ['has', 'point_count'],
+      paint: {
+        'circle-color': COLOR_COLLISION_FILL,
+        'circle-radius': [
+          'step',
+          ['get', 'point_count'],
+          8,
+          10, 10,
+          100, 14,
+          1000, 16,
+        ],
+        'circle-stroke-color': COLOR_COLLISION_STROKE,
+        'circle-stroke-width': 1,
+      },
+    });
+    map.addLayer({
+      id: 'collisionsClusteredCount',
+      source: 'collisionsClustered',
+      type: 'symbol',
+      minzoom: ZOOM_LEVEL_3,
+      maxzoom: ZOOM_LEVEL_0,
+      filter: ['has', 'point_count'],
+      layout: {
+        'text-field': '{point_count_abbreviated}',
+        'text-font': ['Ubuntu Regular'],
+        'text-size': 12
+      },
+      paint: {
+        'text-color': COLOR_COLLISION_STROKE,
+      }
+    });
+    map.addLayer({
+      id: 'collisionsUnclustered',
+      source: 'collisionsClustered',
+      type: 'circle',
+      minzoom: ZOOM_LEVEL_3,
+      maxzoom: ZOOM_LEVEL_0,
+      filter: ['!', ['has', 'point_count']],
+      paint: {
+        'circle-color': COLOR_COLLISION_FILL,
+        'circle-radius': 4,
+        'circle-stroke-color': COLOR_COLLISION_STROKE,
+        'circle-stroke-width': 1,
+      },
+    });
+  }
+
+  static collisionsPoints(map) {
+    map.addSource('collisions', {
+      type: 'geojson',
+      data: 'data/collisions.geojson',
+      buffer: 0,
     });
     map.addLayer({
       id: 'collisionsPoints',
-      source: 'collisionsPoints',
+      source: 'collisions',
       type: 'circle',
-      minzoom: 10,
-      maxzoom: 19,
+      minzoom: ZOOM_LEVEL_3,
+      maxzoom: ZOOM_LEVEL_0,
       paint: {
         'circle-color': COLOR_COLLISION_FILL,
         'circle-radius': 6.5,
