@@ -169,8 +169,7 @@
       <section>
         <h2>hello, Mapbox GL!</h2>
 
-        <pre>
-          <code data-line-numbers="1-2|3-10|11" data-trim>
+        <pre><code data-line-numbers="1-2|3-10|11" data-trim>
 /* const basemapStyle = ... */
 /* const $mapContainer = ... */
 const options = {
@@ -182,8 +181,7 @@ const options = {
   style: basemapStyle,
 };
 const map = new mapboxgl.Map(options);
-          </code>
-        </pre>
+        </code></pre>
 
         <aside class="notes">
         </aside>
@@ -192,8 +190,7 @@ const map = new mapboxgl.Map(options);
       <section>
         <h2>how to put Toronto at the center of the universe</h2>
 
-        <pre>
-          <code data-line-numbers="1-4,7-8|9-10,12" data-trim>
+        <pre><code data-line-numbers="1-4,7-8|9-10,12" data-trim>
 const BOUNDS_TORONTO = new mapboxgl.LngLatBounds(
   new mapboxgl.LngLat(-79.639264937, 43.580995995),
   new mapboxgl.LngLat(-79.115243191, 43.855457183),
@@ -207,8 +204,7 @@ const optionsToronto = {
   renderWorldCopies: false,
   zoom: 10,
 };
-          </code>
-        </pre>
+        </code></pre>
 
         <aside class="notes">
         </aside>
@@ -225,8 +221,7 @@ const optionsToronto = {
         <h2>exporting GeoJSON</h2>
         <img src="img/postgresql.svg" height="128">
         <img src="img/postgis.png" height="128">
-        <pre>
-          <code data-line-numbers="2-8|9-17|18-22|1|23" data-trim>
+        <pre><code data-line-numbers="2-8|9-17|18-22|1|23" data-trim>
 COPY (
   WITH features AS (
     SELECT
@@ -250,8 +245,7 @@ COPY (
   ) AS feature_collection
   FROM geojson_features
 ) TO STDOUT WITH (HEADER FALSE);
-          </code>
-        </pre>
+        </code></pre>
 
         <aside class="notes">
         </aside>
@@ -259,11 +253,9 @@ COPY (
 
       <section>
         <h2>using GeoJSON in Mapbox GL</h2>
-        <pre>
-          <code data-line-numbers data-trim>
+        <pre><code data-line-numbers data-trim>
 // TODO: this
-          </code>
-        </pre>
+        </code></pre>
 
         <aside class="notes">
         </aside>
@@ -371,11 +363,9 @@ COPY (
       <section>
         <h2>TODO: clustering explanation</h2>
 
-        <pre>
-          <code data-line-numbers data-trim>
+        <pre><code data-line-numbers data-trim>
 /* TODO: code */
-          </code>
-        </pre>
+        </code></pre>
 
         <aside class="notes">
         </aside>
@@ -394,11 +384,9 @@ COPY (
       <section>
         <h2>TODO: heatmap explanation</h2>
 
-        <pre>
-          <code data-line-numbers data-trim>
+        <pre><code data-line-numbers data-trim>
 /* TODO: code */
-          </code>
-        </pre>
+        </code></pre>
 
         <aside class="notes">
         </aside>
@@ -416,11 +404,9 @@ COPY (
       <section>
         <h2>TODO: zoom breakpoints explanation</h2>
 
-        <pre>
-          <code data-line-numbers data-trim>
+        <pre><code data-line-numbers data-trim>
 /* TODO: code */
-          </code>
-        </pre>
+        </code></pre>
 
         <aside class="notes">
         </aside>
@@ -437,11 +423,9 @@ COPY (
       <section>
         <h2>TODO: styling for visual differentiation</h2>
 
-        <pre>
-          <code data-line-numbers data-trim>
+        <pre><code data-line-numbers data-trim>
 /* TODO: code */
-          </code>
-        </pre>
+        </code></pre>
 
         <aside class="notes">
         </aside>
