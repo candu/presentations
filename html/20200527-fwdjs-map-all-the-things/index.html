@@ -252,9 +252,62 @@ COPY (
       </section>
 
       <section>
-        <h2>using GeoJSON in Mapbox GL</h2>
-        <pre><code data-line-numbers data-trim>
-// TODO: this
+        <h2>exporting GeoJSON</h2>
+        <img src="img/postgresql.svg" height="128">
+        <img src="img/postgis.png" height="128">
+        <pre><code data-noescape data-trim>
+# save that SQL query as download_collisions.sql, then:
+env $(xargs < "/home/ec2-user/cot-env.config") psql \
+  -v ON_ERROR_STOP=1 \
+  -f download_collisions.sql > data/collisions.geojson
+        </code></pre>
+
+        <aside class="notes">
+        </aside>
+      </section>
+
+      <section>
+        <h2>loading GeoJSON</h2>
+        <pre><code data-line-numbers="3-6|1,8-11" data-trim>
+let collisions = null;
+
+async function getJson(url) {
+  const response = await fetch(url);
+  return response.json();
+}
+
+async function initMapbox() {
+  collisions = await getJson('data/collisions.geojson');
+  // ...
+}
+        </code></pre>
+
+        <aside class="notes">
+        </aside>
+      </section>
+
+      <section>
+        <h2>using GeoJSON</h2>
+        <pre><code data-line-numbers="1-5|2|3|7-19|8-10|13-18" data-trim>
+map.addSource('collisions', {
+  type: 'geojson',
+  data: collisions,
+  buffer: 0,
+});
+
+map.addLayer({
+  id: 'collisionsPoints',
+  source: 'collisions',
+  type: 'circle',
+  minzoom: ZOOM_LEVEL_3,
+  maxzoom: ZOOM_LEVEL_0,
+  paint: {
+    'circle-color': COLOR_COLLISION_FILL,
+    'circle-radius': 6.5,
+    'circle-stroke-color': COLOR_COLLISION_STROKE,
+    'circle-stroke-width': 1,
+  },
+});
         </code></pre>
 
         <aside class="notes">
