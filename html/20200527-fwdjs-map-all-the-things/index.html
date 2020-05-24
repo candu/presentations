@@ -485,8 +485,8 @@ COPY (
       </section>
 
       <section>
-        <h2><span class="highlight">we're done, right?</span></h2>
-        <p>TODO: GIF of network tab loading GeoJSON datasets</p>
+        <h2>we're done, right?</h2>
+        <img src="img/collisions_loading.gif">
 
         <aside class="notes">
           <p>
@@ -621,6 +621,7 @@ const ZOOM_LEVEL_2 = 14;
 const ZOOM_LEVEL_1 = 17;
 const ZOOM_LEVEL_0 = 19;
 
+let collisions = null;
 let basemapStyle = null;
 let map = null;
 let schools = null;
@@ -632,10 +633,12 @@ async function getJson(url) {
 
 async function initMapbox() {
   const [
+    collisionsData,
     metadata,
     root,
     schoolsData,
   ] = await Promise.all([
+    getJson('data/collisions.geojson'),
     getJson('data/metadata.json'),
     getJson('data/root.json'),
     getJson('data/schools.geojson'),
@@ -655,6 +658,7 @@ async function initMapbox() {
     name: metadata.name,
   };
 
+  collisions = collisionsData;
   schools = schoolsData;
 }
 
@@ -753,12 +757,12 @@ class MapInit {
   static collisionsAllTogetherNow(map) {
     map.addSource('collisions', {
       type: 'geojson',
-      data: 'data/collisions.geojson',
+      data: collisions,
       buffer: 0,
     });
     map.addSource('collisionsClustered', {
       type: 'geojson',
-      data: 'data/collisions.geojson',
+      data: collisions,
       cluster: true,
       clusterMaxZoom: ZOOM_LEVEL_0,
       clusterRadius: 30,
@@ -884,7 +888,7 @@ class MapInit {
   static collisionsClustered(map) {
     map.addSource('collisionsClustered', {
       type: 'geojson',
-      data: 'data/collisions.geojson',
+      data: collisions,
       cluster: true,
       clusterMaxZoom: ZOOM_LEVEL_0,
       clusterRadius: 30,
@@ -945,7 +949,7 @@ class MapInit {
   static collisionsHeatmap(map) {
     map.addSource('collisions', {
       type: 'geojson',
-      data: 'data/collisions.geojson',
+      data: collisions,
       buffer: 0,
     });
     map.addLayer({
@@ -989,7 +993,7 @@ class MapInit {
   static collisionsPoints(map) {
     map.addSource('collisions', {
       type: 'geojson',
-      data: 'data/collisions.geojson',
+      data: collisions,
       buffer: 0,
     });
     map.addLayer({
@@ -1010,7 +1014,7 @@ class MapInit {
   static collisionsVisualDiff() {
     map.addSource('collisionsClustered', {
       type: 'geojson',
-      data: 'data/collisions.geojson',
+      data: collisions,
       cluster: true,
       clusterMaxZoom: ZOOM_LEVEL_0,
       clusterProperties: {
