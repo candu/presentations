@@ -199,10 +199,10 @@ const optionsToronto = {
   ...options,
   center: BOUNDS_TORONTO.getCenter(),
   maxBounds: BOUNDS_TORONTO,
-  maxZoom: 19,
-  minZoom: 10,
+  maxZoom: ZOOM_LEVEL_0,
+  minZoom: ZOOM_LEVEL_3,
   renderWorldCopies: false,
-  zoom: 10,
+  zoom: ZOOM_LEVEL_3,
 };
         </code></pre>
 
@@ -414,11 +414,31 @@ map.addLayer({
       </section>
 
       <section>
-        <h2>TODO: clustering explanation</h2>
+        <h2>clustered sources</h2>
 
-        <pre><code data-line-numbers data-trim>
-/* TODO: code */
+        <pre><code data-line-numbers="1-7|2-3|4-6" data-trim>
+map.addSource('collisionsClustered', {
+  type: 'geojson',
+  data: collisions,
+  cluster: true,
+  clusterMaxZoom: ZOOM_LEVEL_0,
+  clusterRadius: 30,
+});
         </code></pre>
+
+        <aside class="notes">
+        </aside>
+      </section>
+
+      <section>
+        <h2>clustered layers</h2>
+        <p>defining three layers:</p>
+        <ul>
+          <li><code>'collisionsClustered'</code> for cluster circles</li>
+          <li><code>'collisionsClusteredCount'</code> for cluster counts</li>
+          <li><code>'collisionsUnclustered'</code> for point circles</li>
+        </ul>
+        <img src="img/cluster-screenshot.png">
 
         <aside class="notes">
         </aside>
@@ -435,10 +455,53 @@ map.addLayer({
       </section>
 
       <section>
-        <h2>TODO: heatmap explanation</h2>
+        <h2>it's all a blur</h2>
+        <img class="stretch" src="img/gaussian-kernel.png">
 
-        <pre><code data-line-numbers data-trim>
-/* TODO: code */
+        <aside class="notes">
+        </aside>
+      </section>
+
+      <section>
+        <h2>it's all a blur</h2>
+
+        <pre><code data-line-numbers="2-4|7|8-15|16-22|23-29|30-34" data-trim>
+map.addLayer({
+  id: 'collisionsHeatmap',
+  source: 'collisions',
+  type: 'heatmap',
+  minzoom: ZOOM_LEVEL_3,
+  maxzoom: ZOOM_LEVEL_0,
+  paint: {
+    'heatmap-color': [
+      'interpolate',
+      ['linear'],
+      ['heatmap-density'],
+      0, COLOR_COLLISION_HEATMAP_ZERO,
+      0.5, COLOR_COLLISION_HEATMAP_HALF,
+      1, COLOR_COLLISION_FILL,
+    ],
+    'heatmap-intensity': [
+      'interpolate',
+      ['linear'],
+      ['zoom'],
+      ZOOM_LEVEL_3, 0.33,
+      ZOOM_LEVEL_2, 1,
+    ],
+    'heatmap-radius': [
+      'interpolate',
+      ['linear'],
+      ['zoom'],
+      ZOOM_LEVEL_3, 5,
+      ZOOM_LEVEL_2, 10,
+    ],
+    'heatmap-weight': [
+      'case',
+      ['get', 'ksi'], 3,
+      0.03,
+    ],
+  },
+});
         </code></pre>
 
         <aside class="notes">
@@ -455,10 +518,42 @@ map.addLayer({
       </section>
 
       <section>
-        <h2>TODO: zoom breakpoints explanation</h2>
-
-        <pre><code data-line-numbers data-trim>
-/* TODO: code */
+        <h2>zoom breakpoints</h2>
+        <pre><code data-line-numbers="4-6|4,8-14|21-23|21,25-31" data-trim>
+map.addLayer({
+  id: 'collisionsHeatmap',
+  source: 'collisions',
+  type: 'heatmap',
+  minzoom: ZOOM_LEVEL_3,
+  maxzoom: ZOOM_LEVEL_2 + 1,
+  paint: {
+    'heatmap-opacity': [
+      'interpolate',
+      ['linear'],
+      ['zoom'],
+      ZOOM_LEVEL_2, 0.8,
+      ZOOM_LEVEL_2 + 1, 0,
+    ],
+    // ...
+  },
+});
+map.addLayer({
+  id: 'collisionsClustered',
+  source: 'collisionsClustered',
+  type: 'circle',
+  minzoom: ZOOM_LEVEL_2,
+  maxzoom: ZOOM_LEVEL_0,
+  paint: {
+    'circle-opacity': [
+      'interpolate',
+      ['linear'],
+      ['zoom'],
+      ZOOM_LEVEL_2, 0.2,
+      ZOOM_LEVEL_2 + 1, 1,
+    ],
+    // ...
+  },
+});
         </code></pre>
 
         <aside class="notes">
