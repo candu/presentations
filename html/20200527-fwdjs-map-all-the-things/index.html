@@ -43,7 +43,7 @@
   line-height: 1.8rem;
 }
 
-.reveal a {
+.reveal a.toronto-blue {
   color: #005695;
 }
 </style>
@@ -57,7 +57,7 @@
         <h2>With Mapbox GL</h2>
         <div class="stretch"></div>
         <p>
-          <a href="https://savageevan.com/">Evan Savage</a>
+          <a class="toronto-blue" href="https://savageevan.com/">Evan Savage</a>
         </p>
 
         <aside class="notes">
@@ -569,10 +569,49 @@ map.addLayer({
       </section>
 
       <section>
-        <h2>TODO: styling for visual differentiation</h2>
+        <h2>data-driven styling</h2>
+        <pre><code data-line-numbers="6-8" data-trim>
+map.addSource('collisionsClustered', {
+  type: 'geojson',
+  data: collisions,
+  cluster: true,
+  clusterMaxZoom: ZOOM_LEVEL_0,
+  clusterProperties: {
+    ksiAny: ['any', ['get', 'ksi']],
+  },
+  clusterRadius: 30,
+});
+        </code></pre>
 
-        <pre><code data-line-numbers data-trim>
-/* TODO: code */
+        <aside class="notes">
+        </aside>
+      </section>
+
+      <section>
+        <h2>data-driven styling</h2>
+        <pre><code data-line-numbers="6-10|11-18|5" data-trim>
+map.addLayer({
+  // ...
+  paint: {
+    'circle-radius': [
+      '*',
+      [
+        'case',
+        ['get', 'ksiAny'], 1.25,
+        1,
+      ],
+      [
+        'step',
+        ['get', 'point_count'],
+        8,
+        10, 10,
+        100, 14,
+        1000, 16,
+      ],
+    ],
+    // ...
+  },
+});
         </code></pre>
 
         <aside class="notes">
@@ -581,7 +620,24 @@ map.addLayer({
 
       <section>
         <h2>styling on the fly</h2>
-        <img class="stretch" src="img/flowchart-after.png">
+        <img src="img/flowchart-after.png">
+        <p><a href="https://www.interaction-design.org/literature/article/preattentive-visual-properties-and-how-to-use-them-in-information-visualization">
+          pre-attentive properties
+        </a></p>
+        <p><small>color, size, shape, movement&hellip;</small></p>
+
+
+        <aside class="notes">
+        </aside>
+      </section>
+
+      <section>
+        <h2>styling on the fly</h2>
+        <img src="img/flowchart-after.png">
+        <p><a href="https://www.nngroup.com/articles/progressive-disclosure/">
+          progressive disclosure
+        </a></p>
+        <p><small>on zoom, pan, hover, click&hellip;</small></p>
 
         <aside class="notes">
         </aside>
@@ -589,7 +645,7 @@ map.addLayer({
 
       <section>
         <h2>other approaches</h2>
-        <img class="stretch" src="img/layers.png">
+        <img src="img/layers.png">
 
         <aside class="notes">
           hide / show layers: when showing multiple datasets, can help users hide datasets that
@@ -651,17 +707,26 @@ map.addLayer({
       <section>
         <h2>to the backend!</h2>
         <img src="img/flowchart-after-vector-backend.png">
+        <p>
+          preprocess <em>and</em> style on the fly!
+        </p>
 
         <aside class="notes">
         </aside>
       </section>
 
       <section>
-        <h2>prebuilt tiles: tippecanoe</h2>
-        <p>
-          TODO: ST_AsGeoJSON, tippecanoe command examples
-        </p>
-
+        <h2>prebuilt tiles: <code>tippecanoe</code></h2>
+        <pre class="bash"><code data-trim>
+tippecanoe \
+  -o collisions.mbtiles \
+  -l collisionsClustered \
+  -Z10 -z16 \
+  --accumulate-attribute=ksiAny:any \
+  --cluster-densest-as-needed \
+  -r1 \
+  collisions.geojson
+        </code></pre>
         <aside class="notes">
           great for absolutely massive datasets!  lots of options for simplifying and
           culling features to reduce tileset size.
@@ -669,12 +734,24 @@ map.addLayer({
       </section>
 
       <section>
-        <h2>prebuilt tiles: mbtiles</h2>
+        <h2>prebuilt tiles: <code>.mbtiles</code></h2>
+        <pre class="sql"><code data-trim>
+$ sqlite3 collisions.mbtiles
+sqlite> .schema
+CREATE TABLE metadata (name text, value text);
+CREATE TABLE tiles (
+  zoom_level integer,
+  tile_column integer,
+  tile_row integer,
+  tile_data blob
+);
+CREATE UNIQUE INDEX name on metadata (name);
+CREATE UNIQUE INDEX tile_index on tiles (
+  zoom_level, tile_column, tile_row
+);
+        </code></pre>
         <p>
-          TODO: sqlite look inside MBTiles file
-        </p>
-        <p>
-          TODO: link to mbtiles-server
+          <a href="https://github.com/chelm/mbtiles-server"><code>mbtiles-server</code></a>
         </p>
 
         <aside class="notes">
@@ -685,11 +762,23 @@ map.addLayer({
       </section>
 
       <section>
-        <h2>prebuilt tiles: mbutil</h2>
-        <p>
-          TODO: mbutil command, and output
-        </p>
+        <h2>prebuilt tiles: <code>mb-util</code></h2>
+        <pre class="bash"><code data-trim>
+$ mb-util \
+  --image_format=pbf --silent \
+  collisions.mbtiles /data/tiles/collisions
 
+# wait a while...
+
+$ ls /data/tiles/collisions
+10  11  12  13  14  15  16  metadata.json
+
+$ ls /data/tiles/collisions/10
+281  284  285  286  287  288  296  301
+
+$ ls /data/tiles/collisions/10/281
+375.pbf  376.pbf
+        </code></pre>
         <aside class="notes">
           you can use mbutil to store the tiles as static files!  great for deploying to
           a variety of on-prem and cloud environments.
@@ -698,9 +787,7 @@ map.addLayer({
 
       <section>
         <h2>dynamic tiles</h2>
-        <p>
-          TODO: ST_AsMVT example
-        </p>
+        <img class="stretch" src="img/dynamic-vector.png">
 
         <aside class="notes">
           great for quick prototyping of new vector tile sources on big datasets!
@@ -711,6 +798,9 @@ map.addLayer({
       <section>
         <h2>to the backend!</h2>
         <img src="img/flowchart-after-vector-backend.png">
+        <p>
+          preprocess <em>and</em> style on the fly!
+        </p>
 
         <aside class="notes">
           lots of options here
@@ -722,7 +812,7 @@ map.addLayer({
         <ul>
           <li><em>render</em>: Mapbox GL</li>
           <li>
-            <em>understand</em>: progressive revealing, pre-attentive features,
+            <em>understand</em>: progressive disclosure, pre-attentive properties,
             contextual information, etc.
           </li>
           <li>
