@@ -6,12 +6,12 @@
 
 <title>Map All The Things With Mapbox GL</title>
 
-<link rel="stylesheet" href="css/reset.css">
-<link rel="stylesheet" href="css/reveal.css">
-<link rel="stylesheet" href="css/theme/black.css">
+<link rel="stylesheet" href="reveal/reset.css">
+<link rel="stylesheet" href="reveal/reveal.css">
+<link rel="stylesheet" href="reveal/theme/black.css">
 
 <!-- Theme used for syntax highlighting of code -->
-<link rel="stylesheet" href="lib/css/monokai.css">
+<link rel="stylesheet" href="reveal/plugin/highlight/monokai.css">
 
 <!-- Mapbox GL -->
 <script src='https://api.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js'></script>
@@ -603,7 +603,9 @@ COPY (
   </div>
 <!-- END OF SLIDES -->
 
-<script src="js/reveal.js"></script>
+<script src="reveal/reveal.js"></script>
+<script src="reveal/plugin/notes/notes.js"></script>
+<script src="reveal/plugin/highlight/highlight.js"></script>
 
 <script>
 const BOUNDS_TORONTO = new mapboxgl.LngLatBounds(
@@ -1179,10 +1181,7 @@ function initReveal() {
   Reveal.initialize({
     center: false,
     hash: true,
-    dependencies: [
-      { src: 'plugin/highlight/highlight.js' },
-      { src: 'plugin/notes/notes.js', async: true }
-    ]
+    plugins: [RevealHighlight, RevealNotes],
   });
 
   Reveal.addEventListener('slidechanged', function(evt) {
