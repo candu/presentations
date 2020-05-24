@@ -259,7 +259,7 @@ COPY (
 # save that SQL query as download_collisions.sql, then:
 env $(xargs < "/home/ec2-user/cot-env.config") psql \
   -v ON_ERROR_STOP=1 \
-  -f download_collisions.sql > data/collisions.geojson
+  -f download_collisions.sql > collisions.geojson
         </code></pre>
 
         <aside class="notes">
@@ -277,7 +277,7 @@ async function getJson(url) {
 }
 
 async function initMapbox() {
-  collisions = await getJson('data/collisions.geojson');
+  collisions = await getJson('collisions.geojson');
   // ...
 }
         </code></pre>
@@ -369,13 +369,6 @@ map.addLayer({
           <li>how can we <em>understand</em> this much data?</li>
           <li class="fade">how can we <em>process</em> this much data?</li>
         </ul>
-
-        <aside class="notes">
-        </aside>
-      </section>
-
-      <section data-background-interactive data-map-id="collisionsPoints">
-        <h2><span class="highlight">we can do better</span></h2>
 
         <aside class="notes">
         </aside>
