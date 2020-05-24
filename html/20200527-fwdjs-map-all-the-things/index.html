@@ -24,10 +24,6 @@
   text-transform: none;
 }
 
-img.about-me {
-  height: 200px;
-}
-
 .fade {
   opacity: 0.3;
 }
@@ -46,13 +42,17 @@ img.about-me {
   font-size: 1.5rem;
   line-height: 1.8rem;
 }
+
+.reveal a {
+  color: #005695;
+}
 </style>
 </head>
 <body>
   <div class="reveal">
     <div class="map-container"></div>
     <div class="slides">
-      <section>
+      <section data-background-color="#f7f7f7">
         <h1>Map All The Things</h1>
         <h2>With Mapbox GL</h2>
         <div class="stretch"></div>
@@ -67,10 +67,10 @@ img.about-me {
       <section>
         <h2>about me</h2>
         <div>
-          <img class="about-me" src="img/cfc-web-logo.png">
-          <img class="about-me" src="img/share_toronto_twitter.jpg">
+          <img src="img/cfc-web-logo.png" height="200">
+          <img src="img/share_toronto_twitter.jpg" height="200">
         </div>
-        <img class="about-me" src="img/move.png">
+        <img src="img/move.png" height="200">
 
         <aside class="notes">
           Code for Canada developer fellow working with City of Toronto on MOVE, which is a project
@@ -222,7 +222,9 @@ const optionsToronto = {
       </section>
 
       <section>
-        <h2>exporting GeoJSON from PostgreSQL</h2>
+        <h2>exporting GeoJSON</h2>
+        <img src="img/postgresql.svg" height="128">
+        <img src="img/postgis.png" height="128">
         <pre>
           <code data-line-numbers="2-8|9-17|18-22|1|23" data-trim>
 COPY (
@@ -291,7 +293,7 @@ COPY (
 
       <section>
         <h2>tiling</h2>
-        <p>TODO: slide with tiling</p>
+        <img class="stretch" src="img/tiling.png">
 
         <aside class="notes">
           <p>
@@ -308,12 +310,8 @@ COPY (
 
       <section>
         <h2>your data on vector tiles</h2>
-        <p>
-          TODO: before: [raw data -> GeoJSON / SHP -> render to raster tiles] -> [map]
-        </p>
-        <p>
-          TODO: now: [raw data -> GeoJSON] -> [vector tiles -> render using layer style -> map]
-        </p>
+        <img class="fragment" src="img/flowchart-before.png">
+        <img class="fragment" src="img/flowchart-after.png">
 
         <aside class="notes">
         </aside>
@@ -340,9 +338,23 @@ COPY (
 
       <section>
         <h2>what to do?</h2>
-        <p>images TODO: clustering, heatmaps, visual differentiation</p>
-        <p>clustering: Map of the Jugger World</p>
-        <p>vis diff: MOVE</p>
+        <img class="stretch" src="img/clustering.png">
+
+        <aside class="notes">
+        </aside>
+      </section>
+
+      <section>
+        <h2>what to do?</h2>
+        <img class="stretch" src="img/heatmap.png">
+
+        <aside class="notes">
+        </aside>
+      </section>
+
+      <section>
+        <h2>what to do?</h2>
+        <img class="stretch" src="img/visual-diff.png">
 
         <aside class="notes">
         </aside>
@@ -437,9 +449,7 @@ COPY (
 
       <section>
         <h2>styling on the fly</h2>
-        <p>
-          TODO: [raw data -> GeoJSON] -> [vector tiles -> render using layer style -> map]
-        </p>
+        <img class="stretch" src="img/flowchart-after.png">
 
         <aside class="notes">
         </aside>
@@ -447,22 +457,34 @@ COPY (
 
       <section>
         <h2>other approaches</h2>
-        <p>
-          images TODO: MOVE legend with show / hide toggles; MOVE filter box; SharedStreets
-        </p>
+        <img class="stretch" src="img/layers.png">
 
         <aside class="notes">
-          <p>
-            hide / show layers: when showing multiple datasets, can help users hide datasets that
-            aren't currently relevant to their task.  within datasets, can apply more fine-grained
-            filtering.
-          </p>
-          <p>
-            referencing systems: Toronto centreline, SharedStreets.  useful for answering questions
-            like "what happened at this intersection / on this segment of road?"  opens up possibility
-            of clustering by intersections / segments, which mitigates the clutter / precision tradeoff
-            of clustering.  this also allows selection gestures on intersections / segments.
-          </p>
+          hide / show layers: when showing multiple datasets, can help users hide datasets that
+          aren't currently relevant to their task.
+        </aside>
+      </section>
+
+      <section>
+        <h2>other approaches</h2>
+        <img class="stretch" src="img/filtering.png">
+
+        <aside class="notes">
+          within datasets, can apply more fine-grained filtering to help users find features
+          that are relevant to them.  useful when different user groups are interested in
+          different parts of the dataset.
+        </aside>
+      </section>
+
+      <section>
+        <h2>other approaches</h2>
+        <img class="stretch" src="img/sharedstreets.png">
+
+        <aside class="notes">
+          referencing systems: Toronto centreline, SharedStreets.  useful for answering questions
+          like "what happened at this intersection / on this segment of road?"  opens up possibility
+          of clustering by intersections / segments, which mitigates the clutter / precision tradeoff
+          of clustering.  this also allows selection gestures on intersections / segments.
         </aside>
       </section>
 
@@ -480,31 +502,23 @@ COPY (
 
       <section>
         <h2><span class="highlight">we're done, right?</span></h2>
-        <p>TODO: distinguish KSI collisions from non-KSI collisions</p>
+        <p>TODO: GIF of network tab loading GeoJSON datasets</p>
 
         <aside class="notes">
-          if you can load the whole dataset at once, GeoJSON layers actually work quite well!
-        </aside>
-      </section>
-
-      <section>
-        <h2>loading&hellip;</h2>
-        <p>
-          images TODO: gif of network tab loading collisions data
-        </p>
-
-        <aside class="notes">
-          what if you can't, though?  I can get away with loading a (TODO: size) file here,
-          because the file is on my computer and you're just watching my screen anyways.
-          in a production web application, though, this wouldn't fly.
+          <p>
+            if you can load the whole dataset at once, GeoJSON layers actually work quite well!
+          </p>
+          <p>
+            what if you can't, though?  loading 2.4 MB GeoJSON files is fine for a presentation,
+            but I'm also only loading 3 years of data - we have data back to 1985, or 35 years ago.
+            that would be roughly 20-30 MB, which is way too much for most web applications.
+          </p>
         </aside>
       </section>
 
       <section>
         <h2>to the backend!</h2>
-        <p>
-          TODO: [raw data -> GeoJSON -> vector tiles] -> [render using layer style -> map]
-        </p>
+        <img src="img/flowchart-after-vector-backend.png">
 
         <aside class="notes">
         </aside>
@@ -559,6 +573,46 @@ COPY (
         <aside class="notes">
           great for quick prototyping of new vector tile sources on big datasets!
           great for high zoom level tiles!  slow for tiles containing lots of features
+        </aside>
+      </section>
+
+      <section>
+        <h2>to the backend!</h2>
+        <img src="img/flowchart-after-vector-backend.png">
+
+        <aside class="notes">
+          lots of options here
+        </aside>
+      </section>
+
+      <section>
+        <h2>important questions</h2>
+        <ul>
+          <li><em>render</em>: Mapbox GL</li>
+          <li>
+            <em>understand</em>: progressive revealing, pre-attentive features,
+            contextual information, etc.
+          </li>
+          <li>
+            <em>process</em>: PostgreSQL / PostGIS, tippecanoe, mbutil,
+            cron / Airflow, etc.
+          </li>
+        </ul>
+
+        <aside class="notes">
+          so we've seen a bit about how we can render, understand
+        </aside>
+      </section>
+
+      <section data-background-color="#f7f7f7">
+        <h1>Map All The Things</h1>
+        <h2>With Mapbox GL</h2>
+        <div class="stretch"></div>
+        <p>
+          <a href="https://savageevan.com/">Evan Savage</a>
+        </p>
+
+        <aside class="notes">
         </aside>
       </section>
     </div>
