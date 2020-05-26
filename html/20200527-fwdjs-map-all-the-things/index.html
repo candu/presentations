@@ -1,0 +1,1189 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>Map All The Things With Mapbox GL</title>
+
+<link rel="stylesheet" href="reveal/reset.css">
+<link rel="stylesheet" href="reveal/reveal.css">
+<link rel="stylesheet" href="reveal/theme/black.css">
+
+<!-- Theme used for syntax highlighting of code -->
+<link rel="stylesheet" href="reveal/plugin/highlight/monokai.css">
+
+<!-- Mapbox GL -->
+<script src='https://api.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js'></script>
+<link href='https://api.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css' rel='stylesheet' />
+
+<style>
+.reveal h2 {
+  text-transform: none;
+}
+
+.reveal a.toronto-blue {
+  color: #005695;
+}
+
+.highlight {
+  background-color: #ee0000;
+  padding: 0 0.5rem;
+  text-transform: none;
+}
+
+.fade {
+  opacity: 0.3;
+}
+
+.move-marker {
+  background-image: url('img/school.png');
+  background-size: cover;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.mapboxgl-popup-content {
+  color: black;
+  font-size: 1.5rem;
+  line-height: 1.8rem;
+}
+</style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="map-container"></div>
+    <div class="slides">
+      <section data-background-color="#f7f7f7">
+        <h1>Map All The Things</h1>
+        <h2>With Mapbox GL</h2>
+        <div class="stretch"></div>
+        <p>
+          <a class="toronto-blue" href="https://savageevan.com/">Evan Savage</a>
+        </p>
+      </section>
+
+      <section>
+        <h2>about me</h2>
+        <div>
+          <img src="img/cfc-web-logo.png" height="200">
+          <img src="img/share_toronto_twitter.jpg" height="200">
+        </div>
+        <img src="img/move.png" height="200">
+      </section>
+
+      <section data-background-image="img/torontocivictransportation1915.jpg" data-background-opacity="0.75">
+        <h2><span class="highlight">civic data &#x2665; maps</span></h2>
+        <p><span class="highlight">1915: 500k people</span></p>
+        <p class="fragment"><span class="highlight">1985-2020: 1.5M collisions</span></p>
+        <p class="fragment"><span class="highlight">1985-2020: 120M volume readings</span></p>
+      </section>
+
+      <section data-background-interactive data-map-id="schoolsWat">
+        <h2 class="fragment"><span class="highlight">wat</span></h2>
+      </section>
+
+      <section>
+        <h2>important questions</h2>
+        <ul>
+          <li>how can we <em>render</em> this much data?</li>
+          <li>how can we <em>understand</em> this much data?</li>
+          <li>how can we <em>process</em> this much data?</li>
+        </ul>
+      </section>
+
+      <section data-background-color="#ee0000">
+        <h2>rendering</h2>
+        <ul>
+          <li>how can we <em>render</em> this much data?</li>
+          <li class="fade">how can we <em>understand</em> this much data?</li>
+          <li class="fade">how can we <em>process</em> this much data?</li>
+        </ul>
+      </section>
+
+      <section data-background-interactive data-map-id="helloWorld">
+        <h2><span class="highlight">hello, world!</span></h2>
+      </section>
+
+      <section>
+        <h2>hello, Mapbox GL!</h2>
+
+        <pre><code data-line-numbers="1,4|2,5|6|8" data-trim>
+/* const basemapStyle = ... */
+/* const $mapContainer = ... */
+const options = {
+  style: basemapStyle,
+  container: $mapContainer,
+  ...otherOptions,
+};
+const map = new mapboxgl.Map(options);
+        </code></pre>
+      </section>
+
+      <section data-background-interactive data-map-id="helloToronto">
+        <h2><span class="highlight">hello, Toronto!</span></h2>
+      </section>
+
+      <section>
+        <h2>exporting GeoJSON</h2>
+        <img src="img/postgresql.svg" height="80">
+        <img src="img/postgis.png" height="80">
+        <pre><code data-line-numbers="2-8|6-7|4|5|9-17|12|13|14|18-22|1|23" data-trim>
+COPY (
+  WITH features AS (
+    SELECT
+      collision_id AS "id", geom,
+      ksi
+    FROM collisions.events
+    WHERE accdate >= now() - interval '3 year'
+  ),
+  geojson_features AS (
+    SELECT jsonb_build_object(
+      'type', 'Feature',
+      'id', id,
+      'geometry', ST_AsGeoJSON(geom)::jsonb,
+      'properties', to_jsonb(features.*) - 'id' - 'geom'
+    ) AS feature
+    FROM features
+  )
+  SELECT jsonb_build_object(
+    'type', 'FeatureCollection',
+    'features', jsonb_agg(feature)
+  ) AS feature_collection
+  FROM geojson_features
+) TO STDOUT WITH (HEADER FALSE);
+        </code></pre>
+      </section>
+
+      <section>
+        <h2>exporting GeoJSON</h2>
+        <img src="img/postgresql.svg" height="80">
+        <img src="img/postgis.png" height="80">
+        <pre><code data-noescape data-trim>
+# save that SQL query as download_collisions.sql, then:
+env $(xargs < "/home/ec2-user/cot-env.config") psql \
+  -v ON_ERROR_STOP=1 \
+  -f download_collisions.sql > collisions.geojson
+        </code></pre>
+      </section>
+
+      <section>
+        <h2>loading GeoJSON</h2>
+        <pre><code data-line-numbers="3-6|1,8-11" data-trim>
+let collisions = null;
+
+async function getJson(url) {
+  const response = await fetch(url);
+  return response.json();
+}
+
+async function initMapbox() {
+  collisions = await getJson('collisions.geojson');
+  // ...
+}
+        </code></pre>
+      </section>
+
+      <section>
+        <h2>using GeoJSON</h2>
+        <pre><code data-line-numbers="1-5|2|3|7-19|8-10|13-18" data-trim>
+map.addSource('collisions', {
+  type: 'geojson',
+  data: collisions,
+  buffer: 0,
+});
+
+map.addLayer({
+  id: 'collisionsPoints',
+  source: 'collisions',
+  type: 'circle',
+  minzoom: ZOOM_LEVEL_3,
+  maxzoom: ZOOM_LEVEL_0,
+  paint: {
+    'circle-color': COLOR_COLLISION_FILL,
+    'circle-radius': 6.5,
+    'circle-stroke-color': COLOR_COLLISION_STROKE,
+    'circle-stroke-width': 1,
+  },
+});
+        </code></pre>
+      </section>
+
+      <section data-background-interactive data-map-id="collisionsPoints">
+        <h2 class="fragment"><span class="highlight">we can do better</span></h2>
+      </section>
+
+      <section>
+        <h2>tiling</h2>
+        <img class="stretch" src="img/tiling.png">
+      </section>
+
+      <section>
+        <h2>your data on vector tiles</h2>
+        <img class="fragment" src="img/flowchart-before.png">
+        <img class="fragment" src="img/flowchart-after.png">
+      </section>
+
+      <section data-background-color="#ee0000">
+        <h2>understanding</h2>
+        <ul>
+          <li class="fade">how can we <em>render</em> this much data?</li>
+          <li>how can we <em>understand</em> this much data?</li>
+          <li class="fade">how can we <em>process</em> this much data?</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>what to do?</h2>
+        <img class="stretch" src="img/clustering.png">
+      </section>
+
+      <section>
+        <h2>what to do?</h2>
+        <img class="stretch" src="img/heatmap.png">
+      </section>
+
+      <section>
+        <h2>what to do?</h2>
+        <img class="stretch" src="img/visual-diff.png">
+      </section>
+
+      <section data-background-interactive data-map-id="collisionsClustered">
+        <h2><span class="highlight">clustering</span></h2>
+      </section>
+
+      <section>
+        <h2>clustered sources</h2>
+
+        <pre><code data-line-numbers="1-7|2-3|4,6" data-trim>
+map.addSource('collisionsClustered', {
+  type: 'geojson',
+  data: collisions,
+  cluster: true,
+  clusterMaxZoom: ZOOM_LEVEL_0,
+  clusterRadius: 30,
+});
+        </code></pre>
+      </section>
+
+      <section>
+        <h2>clustered layers</h2>
+        <ul>
+          <li><code>'collisionsClustered'</code> for cluster circles</li>
+          <li><code>'collisionsClusteredCount'</code> for cluster counts</li>
+          <li><code>'collisionsUnclustered'</code> for point circles</li>
+        </ul>
+        <img src="img/cluster-screenshot.png">
+      </section>
+
+      <section data-background-interactive data-map-id="collisionsHeatmap">
+        <h2><span class="highlight">heatmaps</span></h2>
+      </section>
+
+      <section>
+        <h2>it's all a blur</h2>
+				<div>
+        	<img src="img/gaussian-kernel.png" height="400">
+				</div>
+        <a href="https://github.com/mapbox/mapbox-gl-js/blob/master/src/shaders/heatmap.vertex.glsl">heatmap shader</a>
+      </section>
+
+      <section>
+        <h2>it's all a blur</h2>
+
+        <pre><code data-line-numbers="2-4|7|8-15|16-22|23-29|30-34" data-trim>
+map.addLayer({
+  id: 'collisionsHeatmap',
+  source: 'collisions',
+  type: 'heatmap',
+  minzoom: ZOOM_LEVEL_3,
+  maxzoom: ZOOM_LEVEL_0,
+  paint: {
+    'heatmap-color': [
+      'interpolate',
+      ['linear'],
+      ['heatmap-density'],
+      0, COLOR_COLLISION_HEATMAP_ZERO,
+      0.5, COLOR_COLLISION_HEATMAP_HALF,
+      1, COLOR_COLLISION_FILL,
+    ],
+    'heatmap-intensity': [
+      'interpolate',
+      ['linear'],
+      ['zoom'],
+      ZOOM_LEVEL_3, 0.33,
+      ZOOM_LEVEL_2, 1,
+    ],
+    'heatmap-radius': [
+      'interpolate',
+      ['linear'],
+      ['zoom'],
+      ZOOM_LEVEL_3, 5,
+      ZOOM_LEVEL_2, 10,
+    ],
+    'heatmap-weight': [
+      'case',
+      ['get', 'ksi'], 3,
+      0.03,
+    ],
+  },
+});
+        </code></pre>
+      </section>
+
+      <section data-background-interactive data-map-id="collisionsBetterTogether">
+        <h2 class="fragment"><span class="highlight">better together</span></h2>
+      </section>
+
+      <section>
+        <h2>zoom breakpoints</h2>
+        <pre><code data-line-numbers="4-6|4,8-14|21-23|21,25-31" data-trim>
+map.addLayer({
+  id: 'collisionsHeatmap',
+  source: 'collisions',
+  type: 'heatmap',
+  minzoom: ZOOM_LEVEL_3,
+  maxzoom: ZOOM_LEVEL_2 + 1,
+  paint: {
+    'heatmap-opacity': [
+      'interpolate',
+      ['linear'],
+      ['zoom'],
+      ZOOM_LEVEL_2, 0.8,
+      ZOOM_LEVEL_2 + 1, 0,
+    ],
+    // ...
+  },
+});
+map.addLayer({
+  id: 'collisionsPoints',
+  source: 'collisions',
+  type: 'circle',
+  minzoom: ZOOM_LEVEL_2,
+  maxzoom: ZOOM_LEVEL_0,
+  paint: {
+    'circle-opacity': [
+      'interpolate',
+      ['linear'],
+      ['zoom'],
+      ZOOM_LEVEL_2, 0.2,
+      ZOOM_LEVEL_2 + 1, 1,
+    ],
+    // ...
+  },
+});
+        </code></pre>
+      </section>
+
+      <section data-background-interactive data-map-id="collisionsVisualDiff">
+        <h2><span class="highlight">visual differentiation</span></h2>
+      </section>
+
+      <section>
+        <h2>data-driven styling</h2>
+        <pre><code data-line-numbers="6-8" data-trim>
+map.addSource('collisionsClustered', {
+  type: 'geojson',
+  data: collisions,
+  cluster: true,
+  clusterMaxZoom: ZOOM_LEVEL_0,
+  clusterProperties: {
+    ksiAny: ['any', ['get', 'ksi']],
+  },
+  clusterRadius: 30,
+});
+        </code></pre>
+      </section>
+
+      <section>
+        <h2>data-driven styling</h2>
+        <pre><code data-line-numbers="6-10|11-18|5" data-trim>
+map.addLayer({
+  // ...
+  paint: {
+    'circle-radius': [
+      '*',
+      [
+        'case',
+        ['get', 'ksiAny'], 1.25,
+        1,
+      ],
+      [
+        'step',
+        ['get', 'point_count'],
+        8,
+        10, 10,
+        100, 14,
+        1000, 16,
+      ],
+    ],
+    // ...
+  },
+});
+        </code></pre>
+      </section>
+
+      <section data-background-image="img/preattentive.png" data-background-opacity="0.75">
+        <h2><span class="highlight">styling on the fly</span></h2>
+        <p class="fragment fade-up"><span class="highlight">pre-attentive properties</span></p>
+
+        <aside class="notes">
+          this is the power of vector tiles: you can quickly change the representation.
+          instead of hours or days to regenerate tiles, it's a quick code change and page
+          refresh, and you can see the result in seconds.  pre-attentive properties.
+        </aside>
+      </section>
+
+      <section data-background-image="img/progressive-disclosure.jpg" data-background-opacity="0.75">
+        <h2><span class="highlight">styling on the fly</span></h2>
+        <p class="fragment"><span class="highlight">progressive disclosure</span></p>
+
+        <aside class="notes">
+          progressive disclosure: don't need to show everything at once.  different details
+          at different zoom levels.  show summary statistics visually, then allow users to
+          load full details via hover or click interactions.  all helps manage the visual
+          clutter.
+        </aside>
+      </section>
+
+      <section data-background-color="#ee0000">
+        <h2>processing</h2>
+        <ul>
+          <li class="fade">how can we <em>render</em> this much data?</li>
+          <li class="fade">how can we <em>understand</em> this much data?</li>
+          <li>how can we <em>process</em> this much data?</li>
+        </ul>
+
+        <aside class="notes">
+          on to the last question: processing.
+        </aside>
+      </section>
+
+      <section>
+        <h2>we're done, right?</h2>
+        <img src="img/collisions_loading.gif">
+
+        <aside class="notes">
+          <p>
+            if you can load the whole dataset at once, GeoJSON layers actually work quite well!
+          </p>
+          <p>
+            what if you can't, though?  loading 2.4 MB GeoJSON files is fine for a presentation,
+            but I'm also only loading 3 years of data - we have data back to 1985, or 35 years ago.
+            that would be roughly 20-30 MB, which is way too much for most web applications.
+          </p>
+        </aside>
+      </section>
+
+      <section>
+        <h2>to the backend!</h2>
+        <img src="img/flowchart-after-vector-backend.png">
+        <p>
+          preprocess <em>and</em> style on the fly!
+        </p>
+
+        <aside class="notes">
+          this is again part of the power of vector tiles: since we're only sending geometry,
+          not visual style, we can build vector tiles in the backend and continue to style them
+          in the frontend.  best of both worlds.
+        </aside>
+      </section>
+
+      <section>
+        <h2>prebuilt tiles: <code>tippecanoe</code></h2>
+        <pre class="bash"><code data-trim>
+tippecanoe \
+  -o collisions.mbtiles \
+  -l collisionsClustered \
+  -Z10 -z16 \
+  --accumulate-attribute=ksiAny:any \
+  --cluster-densest-as-needed \
+  -r1 \
+  collisions.geojson
+        </code></pre>
+        <aside class="notes">
+          one tool for buliding vector tiles is tippecanoe, also maintained by Mapbox.
+          great for absolutely massive datasets!  lots of options for simplifying and
+          culling features to reduce tileset size.
+        </aside>
+      </section>
+
+      <section>
+        <h2>prebuilt tiles: <code>.mbtiles</code></h2>
+        <pre class="sql"><code data-trim>
+$ sqlite3 collisions.mbtiles
+sqlite> .schema
+CREATE TABLE metadata (name text, value text);
+CREATE TABLE tiles (
+  zoom_level integer,
+  tile_column integer,
+  tile_row integer,
+  tile_data blob
+);
+CREATE UNIQUE INDEX name on metadata (name);
+CREATE UNIQUE INDEX tile_index on tiles (
+  zoom_level, tile_column, tile_row
+);
+        </code></pre>
+        <p>
+          <a href="https://github.com/chelm/mbtiles-server"><code>mbtiles-server</code></a>
+        </p>
+
+        <aside class="notes">
+          tippecanoe produces an mbtiles file.  this is just a sqlite database that
+          maps (z, x, y), or (zoom, column, row), tile coordinates to tile data.
+          with tools like mbtiles-server, you can serve mbtiles files out of the box.
+        </aside>
+      </section>
+
+      <section>
+        <h2>prebuilt tiles: <code>mb-util</code></h2>
+        <pre class="bash"><code data-trim>
+$ mb-util \
+  --image_format=pbf --silent \
+  collisions.mbtiles /data/tiles/collisions
+
+# wait a while...
+
+$ ls /data/tiles/collisions
+10  11  12  13  14  15  16  metadata.json
+
+$ ls /data/tiles/collisions/10
+281  284  285  286  287  288  296  301
+
+$ ls /data/tiles/collisions/10/281
+375.pbf  376.pbf
+        </code></pre>
+        <aside class="notes">
+          if you don't want to launch a separate server just for some map tiles, there's
+          mb-util.  this tool extracts individual tiles from the mbtiles archive, and
+          stores them all into a nested directory structure.  with your tiles as static
+          files, you can host them pretty much anywhere and behind pretty much anything.
+        </aside>
+      </section>
+
+      <section>
+        <h2>dynamic tiles</h2>
+        <img class="stretch" src="img/dynamic-vector.png">
+
+        <aside class="notes">
+          with newer versions of PostgreSQL and PostGIS, you can even generate vector
+          tiles directly from the database.  this opens up even more possibilities for
+          prototyping and iterating on backend vector tile pipelines.
+        </aside>
+      </section>
+
+      <section>
+        <h2>important questions</h2>
+        <ul>
+          <li><em>render</em>: Mapbox GL</li>
+          <li>
+            <em>understand</em>: progressive disclosure, pre-attentive properties,
+            contextual information, etc.
+          </li>
+          <li>
+            <em>process</em>: PostgreSQL / PostGIS, tippecanoe, mbutil,
+            cron / Airflow, etc.
+          </li>
+        </ul>
+
+        <aside class="notes">
+          <p>
+          so we've seen how we can render lots of data in a map.  we've also seen how we
+          can present that data so our users can understand it.  finally, we've seen how
+          we can move vector tile processing to the backend, so that we can handle even
+          larger datasets.
+          </p>
+          <p>
+            this is just the beginning; there's lots of other tools and techniques I didn't
+            have time to cover.  hopefully this gives you a useful place to start, though.
+          </p>
+        </aside>
+      </section>
+
+      <section data-background-color="#f7f7f7">
+        <h1>Map All The Things</h1>
+        <h2>With Mapbox GL</h2>
+        <div class="stretch"></div>
+        <p>
+          <a href="https://savageevan.com/">Evan Savage</a>
+        </p>
+
+        <aside class="notes">
+          thanks for listening, and happy mapping!
+        </aside>
+      </section>
+    </div>
+  </div>
+<!-- END OF SLIDES -->
+
+<script src="reveal/reveal.js"></script>
+<script src="reveal/plugin/notes/notes.js"></script>
+<script src="reveal/plugin/highlight/highlight.js"></script>
+
+<script>
+const BOUNDS_TORONTO = new mapboxgl.LngLatBounds(
+  new mapboxgl.LngLat(-79.639264937, 43.580995995),
+  new mapboxgl.LngLat(-79.115243191, 43.855457183),
+);
+const COLOR_COLLISION_HEATMAP_ZERO = 'rgba(244, 227, 219, 0)';
+const COLOR_COLLISION_HEATMAP_HALF = '#f39268';
+const COLOR_COLLISION_FILL = '#ef4848';
+const COLOR_COLLISION_STROKE = '#773333';
+const ZOOM_LEVEL_3 = 10;
+const ZOOM_LEVEL_2 = 14;
+const ZOOM_LEVEL_1 = 17;
+const ZOOM_LEVEL_0 = 19;
+
+let collisions = null;
+let basemapStyle = null;
+let map = null;
+let schools = null;
+
+async function getJson(url) {
+  const response = await fetch(url);
+  return response.json();
+}
+
+async function initMapbox() {
+  const [
+    collisionsData,
+    metadata,
+    root,
+    schoolsData,
+  ] = await Promise.all([
+    getJson('data/collisions.geojson'),
+    getJson('data/metadata.json'),
+    getJson('data/root.json'),
+    getJson('data/schools.geojson'),
+  ]);
+
+  basemapStyle = JSON.parse(JSON.stringify(root));
+  basemapStyle.sources.esri = {
+    type: 'vector',
+    scheme: 'xyz',
+    tilejson: metadata.tilejson || '2.0.0',
+    format: (metadata.tileInfo && metadata.tileInfo.format) || 'pbf',
+    maxzoom: 15,
+    tiles: [
+      `${basemapStyle.sources.esri.url}${metadata.tiles[0]}`,
+    ],
+    description: metadata.description || '',
+    name: metadata.name,
+  };
+
+  collisions = collisionsData;
+  schools = schoolsData;
+}
+
+class MapOptions {
+  // HELPERS
+
+  static _common() {
+    return {
+      dragRotate: false,
+      keyboard: false,
+      pitchWithRotate: false,
+      renderWorldCopies: true,
+      style: basemapStyle,
+    };
+  }
+
+  static _commonToronto() {
+    return {
+      ...MapOptions._common(),
+      center: BOUNDS_TORONTO.getCenter(),
+      maxBounds: BOUNDS_TORONTO,
+      maxZoom: ZOOM_LEVEL_0,
+      minZoom: ZOOM_LEVEL_3,
+      renderWorldCopies: false,
+      zoom: ZOOM_LEVEL_3,
+    };
+  }
+
+  static get(mapId) {
+    return MapOptions[mapId]();
+  }
+
+  static getContainer() {
+    const $reveal = Reveal.getRevealElement();
+    const i = Reveal.getSlidePastCount() + 1;
+    const selector = `.slide-background:nth-child(${i}) > .slide-background-content`;
+    return $reveal.querySelector(selector);
+  }
+
+  // MAP FUNCTIONS
+
+  static collisionsBetterTogether() {
+    return MapOptions._commonToronto();
+  }
+
+  static collisionsClustered() {
+    return MapOptions._commonToronto();
+  }
+
+  static collisionsHeatmap() {
+    return MapOptions._commonToronto();
+  }
+
+  static collisionsPoints() {
+    return MapOptions._commonToronto();
+  }
+
+  static collisionsVisualDiff() {
+    return {
+      ...MapOptions._commonToronto(),
+      maxZoom: ZOOM_LEVEL_0,
+      minZoom: ZOOM_LEVEL_2,
+      zoom: ZOOM_LEVEL_2,
+    };
+  }
+
+  static helloToronto() {
+    return MapOptions._commonToronto();
+  }
+
+  static helloWorld() {
+    return MapOptions._common();
+  }
+
+  static schoolsThatsBetter() {
+    return {
+      ...MapOptions._commonToronto(),
+      zoom: ZOOM_LEVEL_2,
+    };
+  }
+
+  static schoolsWat() {
+    return MapOptions._commonToronto();
+  }
+}
+
+class MapInit {
+  // HELPERS
+
+  static init(mapId, map) {
+    return MapInit[mapId](map);
+  }
+
+  // MAP FUNCTIONS
+
+  static collisionsBetterTogether(map) {
+    map.addSource('collisions', {
+      type: 'geojson',
+      data: collisions,
+      buffer: 0,
+    });
+
+    map.addLayer({
+      id: 'collisionsHeatmap',
+      source: 'collisions',
+      type: 'heatmap',
+      minzoom: ZOOM_LEVEL_3,
+      maxzoom: ZOOM_LEVEL_2 + 1,
+      paint: {
+        'heatmap-color': [
+          'interpolate',
+          ['linear'],
+          ['heatmap-density'],
+          0, COLOR_COLLISION_HEATMAP_ZERO,
+          0.5, COLOR_COLLISION_HEATMAP_HALF,
+          1, COLOR_COLLISION_FILL,
+        ],
+        'heatmap-intensity': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          ZOOM_LEVEL_3, 0.33,
+          ZOOM_LEVEL_2, 1,
+        ],
+        'heatmap-opacity': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          ZOOM_LEVEL_2, 0.8,
+          ZOOM_LEVEL_2 + 1, 0,
+        ],
+        'heatmap-radius': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          ZOOM_LEVEL_3, 5,
+          ZOOM_LEVEL_2, 10,
+        ],
+        'heatmap-weight': [
+          'case',
+          ['get', 'ksi'], 3,
+          0.03,
+        ],
+      },
+    });
+    map.addLayer({
+      id: 'collisionsPoints',
+      source: 'collisions',
+      type: 'circle',
+      minzoom: ZOOM_LEVEL_2,
+      maxzoom: ZOOM_LEVEL_0,
+      layout: {
+        'circle-sort-key': [
+          'case',
+          ['get', 'ksi'], 1,
+          0,
+        ],
+      },
+      paint: {
+        'circle-color': [
+          'case',
+          ['get', 'ksi'], '#272727',
+          COLOR_COLLISION_FILL,
+        ],
+        'circle-opacity': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          ZOOM_LEVEL_2, 0.2,
+          ZOOM_LEVEL_2 + 1, 1,
+        ],
+        'circle-radius': [
+          'case',
+          ['get', 'ksi'], 6,
+          4,
+        ],
+        'circle-stroke-color': [
+          'case',
+          ['get', 'ksi'], '#fff',
+          COLOR_COLLISION_STROKE,
+        ],
+        'circle-stroke-width': [
+          'case',
+          ['get', 'ksi'], 2,
+          1,
+        ],
+      },
+    });
+  }
+
+  static collisionsClustered(map) {
+    map.addSource('collisionsClustered', {
+      type: 'geojson',
+      data: collisions,
+      cluster: true,
+      clusterMaxZoom: ZOOM_LEVEL_0,
+      clusterRadius: 30,
+    });
+    map.addLayer({
+      id: 'collisionsClustered',
+      source: 'collisionsClustered',
+      type: 'circle',
+      minzoom: ZOOM_LEVEL_3,
+      maxzoom: ZOOM_LEVEL_0,
+      filter: ['has', 'point_count'],
+      paint: {
+        'circle-color': COLOR_COLLISION_FILL,
+        'circle-radius': [
+          'step',
+          ['get', 'point_count'],
+          8,
+          10, 10,
+          100, 14,
+          1000, 16,
+        ],
+        'circle-stroke-color': COLOR_COLLISION_STROKE,
+        'circle-stroke-width': 1,
+      },
+    });
+    map.addLayer({
+      id: 'collisionsClusteredCount',
+      source: 'collisionsClustered',
+      type: 'symbol',
+      minzoom: ZOOM_LEVEL_3,
+      maxzoom: ZOOM_LEVEL_0,
+      filter: ['has', 'point_count'],
+      layout: {
+        'text-field': '{point_count_abbreviated}',
+        'text-font': ['Ubuntu Regular'],
+        'text-size': 12
+      },
+      paint: {
+        'text-color': COLOR_COLLISION_STROKE,
+      }
+    });
+    map.addLayer({
+      id: 'collisionsUnclustered',
+      source: 'collisionsClustered',
+      type: 'circle',
+      minzoom: ZOOM_LEVEL_3,
+      maxzoom: ZOOM_LEVEL_0,
+      filter: ['!', ['has', 'point_count']],
+      paint: {
+        'circle-color': COLOR_COLLISION_FILL,
+        'circle-radius': 4,
+        'circle-stroke-color': COLOR_COLLISION_STROKE,
+        'circle-stroke-width': 1,
+      },
+    });
+  }
+
+  static collisionsHeatmap(map) {
+    map.addSource('collisions', {
+      type: 'geojson',
+      data: collisions,
+      buffer: 0,
+    });
+    map.addLayer({
+      id: 'collisionsHeatmap',
+      source: 'collisions',
+      type: 'heatmap',
+      minzoom: ZOOM_LEVEL_3,
+      maxzoom: ZOOM_LEVEL_0,
+      paint: {
+        'heatmap-color': [
+          'interpolate',
+          ['linear'],
+          ['heatmap-density'],
+          0, COLOR_COLLISION_HEATMAP_ZERO,
+          0.5, COLOR_COLLISION_HEATMAP_HALF,
+          1, COLOR_COLLISION_FILL,
+        ],
+        'heatmap-intensity': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          ZOOM_LEVEL_3, 0.33,
+          ZOOM_LEVEL_2, 1,
+        ],
+        'heatmap-radius': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          ZOOM_LEVEL_3, 5,
+          ZOOM_LEVEL_2, 10,
+        ],
+        'heatmap-weight': [
+          'case',
+          ['get', 'ksi'], 3,
+          0.03,
+        ],
+      },
+    });
+  }
+
+  static collisionsPoints(map) {
+    map.addSource('collisions', {
+      type: 'geojson',
+      data: collisions,
+      buffer: 0,
+    });
+    map.addLayer({
+      id: 'collisionsPoints',
+      source: 'collisions',
+      type: 'circle',
+      minzoom: ZOOM_LEVEL_3,
+      maxzoom: ZOOM_LEVEL_0,
+      paint: {
+        'circle-color': COLOR_COLLISION_FILL,
+        'circle-radius': 6.5,
+        'circle-stroke-color': COLOR_COLLISION_STROKE,
+        'circle-stroke-width': 1,
+      },
+    });
+  }
+
+  static collisionsVisualDiff() {
+    map.addSource('collisionsClustered', {
+      type: 'geojson',
+      data: collisions,
+      cluster: true,
+      clusterMaxZoom: ZOOM_LEVEL_0,
+      clusterProperties: {
+        ksiAny: ['any', ['get', 'ksi']],
+      },
+      clusterRadius: 30,
+    });
+    map.addLayer({
+      id: 'collisionsClustered',
+      source: 'collisionsClustered',
+      type: 'circle',
+      minzoom: ZOOM_LEVEL_2,
+      maxzoom: ZOOM_LEVEL_0,
+      filter: ['has', 'point_count'],
+      paint: {
+        'circle-color': [
+          'case',
+          ['get', 'ksiAny'], '#272727',
+          COLOR_COLLISION_FILL,
+        ],
+        'circle-radius': [
+          '*',
+          [
+            'case',
+            ['get', 'ksiAny'], 1.25,
+            1,
+          ],
+          [
+            'step',
+            ['get', 'point_count'],
+            8,
+            10, 10,
+            100, 14,
+            1000, 16,
+          ],
+        ],
+        'circle-stroke-color': [
+          'case',
+          ['get', 'ksiAny'], '#fff',
+          COLOR_COLLISION_STROKE,
+        ],
+        'circle-stroke-width': [
+          'case',
+          ['get', 'ksiAny'], 2,
+          1,
+        ],
+      },
+    });
+    map.addLayer({
+      id: 'collisionsClusteredCount',
+      source: 'collisionsClustered',
+      type: 'symbol',
+      minzoom: ZOOM_LEVEL_2,
+      maxzoom: ZOOM_LEVEL_0,
+      filter: ['has', 'point_count'],
+      layout: {
+        'text-field': '{point_count_abbreviated}',
+        'text-font': [
+          'case',
+          ['get', 'ksiAny'], ['literal', ['Ubuntu Bold']],
+          ['literal', ['Ubuntu Regular']],
+        ],
+        'text-size': 12
+      },
+      paint: {
+        'text-color': [
+          'case',
+          ['get', 'ksiAny'], '#fff',
+          COLOR_COLLISION_STROKE,
+        ],
+      }
+    });
+    map.addLayer({
+      id: 'collisionsUnclustered',
+      source: 'collisionsClustered',
+      type: 'circle',
+      minzoom: ZOOM_LEVEL_2,
+      maxzoom: ZOOM_LEVEL_0,
+      filter: ['!', ['has', 'point_count']],
+      layout: {
+        'circle-sort-key': [
+          'case',
+          ['get', 'ksi'], 1,
+          0,
+        ],
+      },
+      paint: {
+        'circle-color': [
+          'case',
+          ['get', 'ksi'], '#272727',
+          COLOR_COLLISION_FILL,
+        ],
+        'circle-radius': [
+          'case',
+          ['get', 'ksi'], 6,
+          4,
+        ],
+        'circle-stroke-color': [
+          'case',
+          ['get', 'ksi'], '#fff',
+          COLOR_COLLISION_STROKE,
+        ],
+        'circle-stroke-width': [
+          'case',
+          ['get', 'ksi'], 2,
+          1,
+        ],
+      },
+    });
+  }
+
+  static helloToronto(map) {}
+
+  static helloWorld(map) {}
+
+  static schoolsThatsBetter(map) {
+    let popup = null;
+
+    schools.features.forEach((feature) => {
+      var $marker = document.createElement('div');
+      $marker.className = 'move-marker';
+      const marker = new mapboxgl.Marker($marker)
+        .setLngLat(feature.geometry.coordinates)
+        .addTo(map);
+
+      $marker.addEventListener('click', function() {
+        if (popup !== null) {
+          popup.remove();
+        }
+        popup = new mapboxgl.Popup({ offset: 20 })
+          .setText(feature.properties.NAME);
+        marker.setPopup(popup);
+      });
+    });
+  }
+
+  static schoolsWat(map) {
+    schools.features.forEach((feature) => {
+      new mapboxgl.Marker()
+        .setLngLat(feature.geometry.coordinates)
+        .addTo(map);
+    });
+  }
+}
+
+function removeMap() {
+  if (map !== null) {
+    map.remove();
+    map = null;
+  }
+}
+
+function loadMap() {
+  const $currentSlide = Reveal.getCurrentSlide();
+  const { mapId } = $currentSlide.dataset;
+  if (mapId !== undefined) {
+    const $mapContainer = MapOptions.getContainer();
+    const options = MapOptions.get(mapId);
+
+    console.log(mapId, options);
+    map = new mapboxgl.Map({
+      container: $mapContainer,
+      ...options,
+    });
+    map.on('load', () => MapInit.init(mapId, map));
+  }
+}
+
+function initReveal() {
+  Reveal.initialize({
+    center: false,
+    hash: true,
+    plugins: [RevealHighlight, RevealNotes],
+  });
+
+  Reveal.addEventListener('slidechanged', function(evt) {
+    removeMap();
+    loadMap();
+  });
+  Reveal.addEventListener('overviewshown', removeMap);
+  Reveal.addEventListener('overviewhidden', loadMap);
+}
+
+async function main() {
+  await initMapbox();
+  initReveal();
+}
+
+main();
+</script>
+</body>
+</html>

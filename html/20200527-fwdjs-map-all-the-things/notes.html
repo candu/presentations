@@ -1,0 +1,276 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<style>
+body {
+  background-color: #272727;
+  color: #fff;
+  font-size: 150%;
+}
+</style>
+</head>
+<body>
+<h2>Slide 0</h2>
+hi everyone!  welcome to Map All The Things with Mapbox GL.  i'm Evan Savage.
+<h2>Slide 1</h2>
+Code for Canada developer fellow working with City of Toronto on MOVE, which is a project
+to bring decades of the City's collision and traffic volume data into a single platform.
+<h2>Slide 2</h2>
+<p>
+  a lot of data governments (and people) care about is geospatial: you can and should
+  put it on a map.  that's long been the case, as you can see from this 1915 map
+  exploring how people get around Toronto.
+</p>
+<p>
+  so geospatial data's nothing new.  what's new is the size of that data.
+  on the MOVE project, for instance, we handle 1.5M collisions and 120M
+  traffic volume readings.
+</p>
+<h2>Slide 3</h2>
+<p>
+  to put those numbers in context, here's a map of all schools and
+  educational institutions in Toronto.
+</p>
+<p>
+  everyone has seen a map like this.  it's slow to load.  impossible
+  to tell what's going on.  navigation is awful.  only 1200 markers!
+</p>
+<h2>Slide 4</h2>
+<p>
+so that's what this talk is about: how do we handle this much data?
+going to focus on three important questions.
+</p>
+<p>
+  first: how can we render large datasets - what tools can we use that are performant enough?
+  second: how can we understand large datasets - what can we do to help our users make sense of it all?
+  third: how can we process large datasets - what can we do when the data is so large, that we need
+  to do work upfront to even make these first two things possible?
+</p>
+<h2>Slide 5</h2>
+let's start with rendering: showing the data, period.
+<h2>Slide 6</h2>
+to render data in MOVE, we use a library called Mapbox GL.
+it's not the only mapping library out there: Leaflet and OpenLayers.
+that said, it has a number of very useful features, as we'll see
+throughout this presentation.
+<h2>Slide 7</h2>
+<p>
+as with most complex graphics, maps are often built out of layers.  the bottom-most
+layer is your basemap.  (switch back to previous slide to show)  so here, all these
+outlines of continents, and borders, and names of things...that's our basemap.
+</p>
+<p>
+  in web mapping, you need a container div to store your map in.  Mapbox GL is no different.
+</p>
+<p>
+  we won't go over them here, but there's a lot of other options to control interactions
+  and zoom / pan bounds and such.  once we have our options, can create a Mapbox GL Map
+  object.
+</p>
+<h2>Slide 8</h2>
+for this talk, I'll be focusing on data from Toronto.  just as with other
+mapping libraries, you can set minimum and maximum zoom levels as well as a bounding
+box for panning.  unlikely that you need all zoom levels.
+<h2>Slide 9</h2>
+<p>
+next up: our dataset.  I'm using the collisions dataset from MOVE.  can't share this
+quite yet, but we're in the process of publishing through Open Data.
+</p>
+<p>
+  so we need some GeoJSON features.  I'm using the last 3 years, or about 150k
+  collisions.  in Mapbox GL, each feature needs a unique numeric ID and a geometry.
+  you can also add more properties.  here we're taking KSI, which stands for
+  killed and seriously injured collisions - these can't be reduced to mere
+  data points, but it is crucial to understand where, when, and why these are occurring
+  so that we can reduce and, someday, eliminate the deadliest collisions from our
+  roadways.
+</p>
+<p>
+  we can then take those features and convert them to
+  GeoJSON features using JSON functions in PostgreSQL.  then we can aggregate
+  them all into a GeoJSON feature collection and dump that out.
+</p>
+<h2>Slide 10</h2>
+we store this SQL query in a file download_collisions.sql and run it, storing
+its output into a GeoJSON file.
+<h2>Slide 11</h2>
+we can then use the Fetch API available in modern browsers to load this
+data into a JavaScript object.
+<h2>Slide 12</h2>
+<p>
+  now the fun part.  we start with source: GeoJSON type, using our newly loaded
+  collisions data.  we then create layer: give it an ID, tie it to the collisions
+  source, and use type circle - we're going to draw circles for each data point.
+</p>
+<p>
+  in Mapbox GL, you can style your layers.  here we're telling it how to draw
+  these circles: what color, what outline, how big.
+</p>
+<h2>Slide 13</h2>
+<p>
+  takes a while to load: as we'll discuss in a bit, Mapbox GL is doing a lot of work up
+  front to make sure we can navigate this smoothly once it loads.
+</p>
+<p>
+  the result is pretty jarring, and in more ways than one.  first: that's 150k collisions
+  over 3 years.  50k per year, 150 per day, 6 per hour.  even though most are minor, the
+  human impact of this is staggering.  we can, and must, do better.
+</p>
+
+<p>
+  this makes it especially shameful that this map doesn't do the dataset justice.
+  for a City staff member trying to improve safety on our roads and pathways, this is
+  more or less completely useless.  here, too, we can and must do better.
+</p>
+
+<p>
+  about the only good thing here is that, using Mapbox GL GeoJSON sources and layers,
+  we can navigate this dataset much more smoothly than our marker-based schools map
+  even though there's a lot more data.
+</p>
+<h2>Slide 14</h2>
+<p>
+  so what is Mapbox GL doing in those first few seconds?  it's building vector tiles on the
+  fly!  pretty much every web map works this way: you divide your data into tiles at
+  different zoom levels.  at each zoom level, you split the previous level's tiles into
+  four smaller tiles.  you can then show different amounts of detail at different zoom levels.
+</p>
+<h2>Slide 15</h2>
+<p>
+note I said vector tiles.  in days of yore, you'd get your data out of database or
+wherever as a shapefile, then you'd pick a style, then you'd render that data down
+to raster image tiles, and you'd serve those pre-rendered tiles to the client.  if
+you wanted to change the style, you had to rebuild your tiles from scratch.
+</p>
+<p>
+  now, we still need to get the data - this time in GeoJSON format - but we can send
+  that data down to the client, build vector tiles on the fly, then style them however
+  we want!  this makes it much faster to iterate on web maps.
+</p>
+<h2>Slide 16</h2>
+so we can render data easily with Mapbox GL, and aside from a bit of loading time it
+works with midsized datasets quite well.  we're still not helping users understand
+this much data, though.  what can we do?  we'll explore three ways of dealing with
+this:
+<h2>Slide 17</h2>
+clustering, where you group nearby points;
+<h2>Slide 18</h2>
+heatmaps, where you blur points together;
+<h2>Slide 19</h2>
+and visual differentiation, where you style various parts of your data
+in different ways.
+<h2>Slide 20</h2>
+group nearby points.  reduces clutter, but loses location precision!
+<h2>Slide 21</h2>
+same GeoJSON source as before.  add cluster option.  we can change the cluster radius
+to adjust the tradeoff between clutter and precision.
+<h2>Slide 22</h2>
+to display this, we now need 3 layers instead of 1.  the first two draw the clustered
+circles with a label showing how many points are in the cluster.  the last one handles
+points that are by themselves, not in a cluster.  we need two for the clusters because
+of how Mapbox GL styles work: we need to style the circle and the text separately.
+<h2>Slide 23</h2>
+blur points together.  good for visualizing density, but doesn't work so
+well with sparse data.
+<h2>Slide 24</h2>
+heatmaps work by blurring your points across a radius, then adding all those
+blurred points up.  by adding enough peaks and sides of peaks together, we get
+hotspots.  math aside, the key here for our purposes is that this can be done
+efficiently using GL shaders.
+<h2>Slide 25</h2>
+<p>
+  we can create a heatmap by using the heatmap layer type.
+</p>
+<p>
+  we have a lot of things we can adjust here.  we can define a color ramp to blend
+  seamlessly between heatmap intensity levels.  we can define a global intensity, which
+  we increase as we zoom in to compensate for points spreading out.  same with that
+  blur radius: we increase that too.
+</p>
+<p>
+  allows for weighting of points: maybe some are more important than others.  our KSI
+  collisions - remember, where someone was killed or seriously injured - each and every
+  one of these is unacceptable, and they need to be given the highest visual priority.
+</p>
+<h2>Slide 26</h2>
+using Mapbox GL, we can set "zoom breakpoints" and blend layers together.
+heatmap mainly useful zoomed out, clusters and points mainly useful closer in.
+blend between them as the user zooms.  we're also getting a sneak preview of visual
+differentiation here: we've made KSI collisions more visually prominent.  we'll get
+back to that in more detail shortly.
+<h2>Slide 27</h2>
+achieved by setting min and max zoom on different layers.  here we have the heatmap continue
+1 zoom level past its breakpoint - we fade the heatmap out over that zoom level using opacity.
+at the same time, we fade the clusters and points in to get a nice crossfade.
+<h2>Slide 28</h2>
+focus attention to more important points: bigger, brighter, visually distinct.
+remember KSI: we want to draw attention to those, so we change the color, radius,
+font, and other visual features.
+<h2>Slide 29</h2>
+first, we want to know if a cluster contains a KSI collision.  we use
+cluster properties to aggregate these together - ksiAny is true if any
+collision has the KSI flag set.
+<h2>Slide 30</h2>
+now we can use that aggregated property to style things.  here we want a bigger
+radius when ksiAny is true.  we can also increase the radius with the number of
+points in the cluster.  we can even multiply these two together to combine these
+effects.
+<h2>Slide 31</h2>
+this is the power of vector tiles: you can quickly change the representation.
+instead of hours or days to regenerate tiles, it's a quick code change and page
+refresh, and you can see the result in seconds.  pre-attentive properties.
+<h2>Slide 32</h2>
+progressive disclosure: don't need to show everything at once.  different details
+at different zoom levels.  show summary statistics visually, then allow users to
+load full details via hover or click interactions.  all helps manage the visual
+clutter.
+<h2>Slide 33</h2>
+on to the last question: processing.
+<h2>Slide 34</h2>
+<p>
+  if you can load the whole dataset at once, GeoJSON layers actually work quite well!
+</p>
+<p>
+  what if you can't, though?  loading 2.4 MB GeoJSON files is fine for a presentation,
+  but I'm also only loading 3 years of data - we have data back to 1985, or 35 years ago.
+  that would be roughly 20-30 MB, which is way too much for most web applications.
+</p>
+<h2>Slide 35</h2>
+this is again part of the power of vector tiles: since we're only sending geometry,
+not visual style, we can build vector tiles in the backend and continue to style them
+in the frontend.  best of both worlds.
+<h2>Slide 36</h2>
+one tool for buliding vector tiles is tippecanoe, also maintained by Mapbox.
+great for absolutely massive datasets!  lots of options for simplifying and
+culling features to reduce tileset size.
+<h2>Slide 37</h2>
+tippecanoe produces an mbtiles file.  this is just a sqlite database that
+maps (z, x, y), or (zoom, column, row), tile coordinates to tile data.
+with tools like mbtiles-server, you can serve mbtiles files out of the box.
+<h2>Slide 38</h2>
+if you don't want to launch a separate server just for some map tiles, there's
+mb-util.  this tool extracts individual tiles from the mbtiles archive, and
+stores them all into a nested directory structure.  with your tiles as static
+files, you can host them pretty much anywhere and behind pretty much anything.
+<h2>Slide 39</h2>
+with newer versions of PostgreSQL and PostGIS, you can even generate vector
+tiles directly from the database.  this opens up even more possibilities for
+prototyping and iterating on backend vector tile pipelines.
+<h2>Slide 40</h2>
+<p>
+so we've seen how we can render lots of data in a map.  we've also seen how we
+can present that data so our users can understand it.  finally, we've seen how
+we can move vector tile processing to the backend, so that we can handle even
+larger datasets.
+</p>
+<p>
+  this is just the beginning; there's lots of other tools and techniques I didn't
+  have time to cover.  hopefully this gives you a useful place to start, though.
+</p>
+<h2>Slide 41</h2>
+thanks for listening, and happy mapping!
+</body>
+
+</html>
