@@ -205,8 +205,8 @@ const map = new mapboxgl.Map(options);
 
       <section>
         <h2>exporting GeoJSON</h2>
-        <img src="img/postgresql.svg" height="128">
-        <img src="img/postgis.png" height="128">
+        <img src="img/postgresql.svg" height="80">
+        <img src="img/postgis.png" height="80">
         <pre><code data-line-numbers="2-8|9-17|18-22|1|23" data-trim>
 COPY (
   WITH features AS (
@@ -250,8 +250,8 @@ COPY (
 
       <section>
         <h2>exporting GeoJSON</h2>
-        <img src="img/postgresql.svg" height="128">
-        <img src="img/postgis.png" height="128">
+        <img src="img/postgresql.svg" height="80">
+        <img src="img/postgis.png" height="80">
         <pre><code data-noescape data-trim>
 # save that SQL query as download_collisions.sql, then:
 env $(xargs < "/home/ec2-user/cot-env.config") psql \
@@ -458,7 +458,6 @@ map.addSource('collisionsClustered', {
 
       <section>
         <h2>clustered layers</h2>
-        <p>defining three layers:</p>
         <ul>
           <li><code>'collisionsClustered'</code> for cluster circles</li>
           <li><code>'collisionsClusteredCount'</code> for cluster counts</li>
@@ -485,7 +484,9 @@ map.addSource('collisionsClustered', {
 
       <section>
         <h2>it's all a blur</h2>
-        <img class="stretch" src="img/gaussian-kernel.png">
+				<div>
+        	<img src="img/gaussian-kernel.png" height="400">
+				</div>
         <a href="https://github.com/mapbox/mapbox-gl-js/blob/master/src/shaders/heatmap.vertex.glsl">heatmap shader</a>
 
         <aside class="notes">
