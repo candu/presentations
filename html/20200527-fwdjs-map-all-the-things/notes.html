@@ -197,7 +197,9 @@ efficiently using GL shaders.
 <h2>Slide 26</h2>
 using Mapbox GL, we can set "zoom breakpoints" and blend layers together.
 heatmap mainly useful zoomed out, clusters and points mainly useful closer in.
-blend between them as the user zooms.
+blend between them as the user zooms.  we're also getting a sneak preview of visual
+differentiation here: we've made KSI collisions more visually prominent.  we'll get
+back to that in more detail shortly.
 <h2>Slide 27</h2>
 achieved by setting min and max zoom on different layers.  here we have the heatmap continue
 1 zoom level past its breakpoint - we fade the heatmap out over that zoom level using opacity.
