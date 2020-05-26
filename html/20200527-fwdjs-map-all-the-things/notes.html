@@ -34,8 +34,8 @@ to bring decades of the City's collision and traffic volume data into a single p
   educational institutions in Toronto.
 </p>
 <p>
-  everyone has seen a map like this.  it's slow to load, and impossible
-  to tell what's going on - and there's only 1200 markers!
+  everyone has seen a map like this.  it's slow to load.  impossible
+  to tell what's going on.  navigation is awful.  only 1200 markers!
 </p>
 <h2>Slide 4</h2>
 <p>
@@ -43,11 +43,10 @@ so that's what this talk is about: how do we handle this much data?
 going to focus on three important questions.
 </p>
 <p>
-  to handle larger datasets on maps, we need performant tools for
-  rendering a lot of data at once.
-  to understand these datasets, we need to carefully present it.
-  and to handle especially large or complex datasets, we need to process it ahead
-  of time to make these first two things possible.
+  first: how can we render large datasets - what tools can we use that are performant enough?
+  second: how can we understand large datasets - what can we do to help our users make sense of it all?
+  third: how can we process large datasets - what can we do when the data is so large, that we need
+  to do work upfront to even make these first two things possible?
 </p>
 <h2>Slide 5</h2>
 let's start with rendering: showing the data, period.
@@ -59,19 +58,19 @@ throughout this presentation.
 <h2>Slide 7</h2>
 <p>
 as with most complex graphics, maps are often built out of layers.  the bottom-most
-layer is your basemap, with everything from continents to streets, parks, and buildings.
+layer is your basemap.  (switch back to previous slide to show)  so here, all these
+outlines of continents, and borders, and names of things...that's our basemap.
 </p>
 <p>
   in web mapping, you need a container div to store your map in.  Mapbox GL is no different.
 </p>
 <p>
-  I've disabled a bunch of Mapbox GL's 3D navigation features for this talk - so I won't
-  be showing those off, but with the right data they're really awesome.  finally we load all
-  of these options into a map object.
+  we won't go over them here, but there's a lot of other options to control interactions
+  and zoom / pan bounds and such.  once we have our options, can create a Mapbox GL Map
+  object.
 </p>
 <h2>Slide 8</h2>
-for this talk, I'll be focusing on data from Toronto.  that means we need to put
-Toronto in its rightful place at the center of the universe.  just as with other
+for this talk, I'll be focusing on data from Toronto.  just as with other
 mapping libraries, you can set minimum and maximum zoom levels as well as a bounding
 box for panning.  unlikely that you need all zoom levels.
 <h2>Slide 9</h2>
@@ -80,9 +79,16 @@ next up: our dataset.  I'm using the collisions dataset from MOVE.  can't share 
 quite yet, but we're in the process of publishing through Open Data.
 </p>
 <p>
-  I'm using the last 3 years, or about 150k collisions.  I pull those out of the
-  database: in Mapbox GL, each feature needs an ID and a geometry; you can also
-  add more properties.  we can then take those features and convert them to
+  so we need some GeoJSON features.  I'm using the last 3 years, or about 150k
+  collisions.  in Mapbox GL, each feature needs a unique numeric ID and a geometry.
+  you can also add more properties.  here we're taking KSI, which stands for
+  killed and seriously injured collisions - these can't be reduced to mere
+  data points, but it is crucial to understand where, when, and why these are occurring
+  so that we can reduce and, someday, eliminate the deadliest collisions from our
+  roadways.
+</p>
+<p>
+  we can then take those features and convert them to
   GeoJSON features using JSON functions in PostgreSQL.  then we can aggregate
   them all into a GeoJSON feature collection and dump that out.
 </p>
@@ -107,20 +113,22 @@ data into a JavaScript object.
   takes a while to load: as we'll discuss in a bit, Mapbox GL is doing a lot of work up
   front to make sure we can navigate this smoothly once it loads.
 </p>
-<p></p>
+<p>
   the result is pretty jarring, and in more ways than one.  first: that's 150k collisions
   over 3 years.  50k per year, 150 per day, 6 per hour.  even though most are minor, the
-  human impact of this is staggering.
-<p></p>
-
-<p>
-  this map doesn't do the dataset justice.  you can see there's a lot of collisions,
-  but it's impossible to get much more than that.
+  human impact of this is staggering.  we can, and must, do better.
 </p>
 
 <p>
-  that said, once it loads, we can navigate pretty smoothly.  if you've ever tried loading
-  150k div markers on a mapping library, it's not this smooth.
+  this makes it especially shameful that this map doesn't do the dataset justice.
+  for a City staff member trying to improve safety on our roads and pathways, this is
+  more or less completely useless.  here, too, we can and must do better.
+</p>
+
+<p>
+  about the only good thing here is that, using Mapbox GL GeoJSON sources and layers,
+  we can navigate this dataset much more smoothly than our marker-based schools map
+  even though there's a lot more data.
 </p>
 <h2>Slide 14</h2>
 <p>

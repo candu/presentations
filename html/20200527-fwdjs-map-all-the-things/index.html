@@ -63,10 +63,6 @@
         <p>
           <a class="toronto-blue" href="https://savageevan.com/">Evan Savage</a>
         </p>
-
-        <aside class="notes">
-          hi everyone!  welcome to Map All The Things with Mapbox GL.  i'm Evan Savage.
-        </aside>
       </section>
 
       <section>
@@ -76,44 +72,17 @@
           <img src="img/share_toronto_twitter.jpg" height="200">
         </div>
         <img src="img/move.png" height="200">
-
-        <aside class="notes">
-          Code for Canada developer fellow working with City of Toronto on MOVE, which is a project
-          to bring decades of the City's collision and traffic volume data into a single platform.
-        </aside>
       </section>
 
-      <section>
-        <h2>civic data &#x2665; maps</h2>
-        <img src="img/torontocivictransportation1915.jpg">
-
-        <aside class="notes">
-          <p>
-            a lot of data governments (and people) care about is geospatial: you can and should
-            put it on a map.  that's long been the case, as you can see from this 1915 map
-            exploring how people get around Toronto.
-          </p>
-          <p>
-            so geospatial data's nothing new.  what's new is the size of that data.
-            on the MOVE project, for instance, we handle 1.5M collisions and 120M
-            traffic volume readings.
-          </p>
-        </aside>
+      <section data-background-image="img/torontocivictransportation1915.jpg" data-background-opacity="0.75">
+        <h2><span class="highlight">civic data &#x2665; maps</span></h2>
+        <p><span class="highlight">1915: 500k people</span></p>
+        <p class="fragment"><span class="highlight">1985-2020: 1.5M collisions</span></p>
+        <p class="fragment"><span class="highlight">1985-2020: 120M volume readings</span></p>
       </section>
 
       <section data-background-interactive data-map-id="schoolsWat">
-        <h2><span class="highlight">wat</span></h2>
-
-        <aside class="notes">
-          <p>
-            to put those numbers in context, here's a map of all schools and
-            educational institutions in Toronto.
-          </p>
-          <p>
-            everyone has seen a map like this.  it's slow to load, and impossible
-            to tell what's going on - and there's only 1200 markers!
-          </p>
-        </aside>
+        <h2 class="fragment"><span class="highlight">wat</span></h2>
       </section>
 
       <section>
@@ -123,20 +92,6 @@
           <li>how can we <em>understand</em> this much data?</li>
           <li>how can we <em>process</em> this much data?</li>
         </ul>
-
-        <aside class="notes">
-          <p>
-          so that's what this talk is about: how do we handle this much data?
-          going to focus on three important questions.
-          </p>
-          <p>
-            to handle larger datasets on maps, we need performant tools for
-            rendering a lot of data at once.
-            to understand these datasets, we need to carefully present it.
-            and to handle especially large or complex datasets, we need to process it ahead
-            of time to make these first two things possible.
-          </p>
-        </aside>
       </section>
 
       <section data-background-color="#ee0000">
@@ -146,77 +101,41 @@
           <li class="fade">how can we <em>understand</em> this much data?</li>
           <li class="fade">how can we <em>process</em> this much data?</li>
         </ul>
-
-        <aside class="notes">
-          let's start with rendering: showing the data, period.
-        </aside>
       </section>
 
       <section data-background-interactive data-map-id="helloWorld">
         <h2><span class="highlight">hello, world!</span></h2>
-
-        <aside class="notes">
-          to render data in MOVE, we use a library called Mapbox GL.
-          it's not the only mapping library out there: Leaflet and OpenLayers.
-          that said, it has a number of very useful features, as we'll see
-          throughout this presentation.
-        </aside>
       </section>
 
       <section>
         <h2>hello, Mapbox GL!</h2>
 
-        <pre><code data-line-numbers="1,9|2,4|3-10|11" data-trim>
+        <pre><code data-line-numbers="1,4|2,5|6|8" data-trim>
 /* const basemapStyle = ... */
 /* const $mapContainer = ... */
 const options = {
-  container: $mapContainer,
-  dragRotate: false,
-  keyboard: false,
-  pitchWithRotate: false,
-  renderWorldCopies: true,
   style: basemapStyle,
+  container: $mapContainer,
+  ...otherOptions,
 };
 const map = new mapboxgl.Map(options);
         </code></pre>
-
-        <aside class="notes">
-          <p>
-          as with most complex graphics, maps are often built out of layers.  the bottom-most
-          layer is your basemap, with everything from continents to streets, parks, and buildings.
-          </p>
-          <p>
-            in web mapping, you need a container div to store your map in.  Mapbox GL is no different.
-          </p>
-          <p>
-            I've disabled a bunch of Mapbox GL's 3D navigation features for this talk - so I won't
-            be showing those off, but with the right data they're really awesome.  finally we load all
-            of these options into a map object.
-          </p>
-        </aside>
       </section>
 
       <section data-background-interactive data-map-id="helloToronto">
         <h2><span class="highlight">hello, Toronto!</span></h2>
-
-        <aside class="notes">
-          for this talk, I'll be focusing on data from Toronto.  that means we need to put
-          Toronto in its rightful place at the center of the universe.  just as with other
-          mapping libraries, you can set minimum and maximum zoom levels as well as a bounding
-          box for panning.  unlikely that you need all zoom levels.
-        </aside>
       </section>
 
       <section>
         <h2>exporting GeoJSON</h2>
         <img src="img/postgresql.svg" height="80">
         <img src="img/postgis.png" height="80">
-        <pre><code data-line-numbers="2-8|9-17|18-22|1|23" data-trim>
+        <pre><code data-line-numbers="2-8|6-7|4|5|9-17|12|13|14|18-22|1|23" data-trim>
 COPY (
   WITH features AS (
     SELECT
       collision_id AS "id", geom,
-      ksi, cyclist, pedestrian
+      ksi
     FROM collisions.events
     WHERE accdate >= now() - interval '3 year'
   ),
@@ -236,20 +155,6 @@ COPY (
   FROM geojson_features
 ) TO STDOUT WITH (HEADER FALSE);
         </code></pre>
-
-        <aside class="notes">
-          <p>
-          next up: our dataset.  I'm using the collisions dataset from MOVE.  can't share this
-          quite yet, but we're in the process of publishing through Open Data.
-          </p>
-          <p>
-            I'm using the last 3 years, or about 150k collisions.  I pull those out of the
-            database: in Mapbox GL, each feature needs an ID and a geometry; you can also
-            add more properties.  we can then take those features and convert them to
-            GeoJSON features using JSON functions in PostgreSQL.  then we can aggregate
-            them all into a GeoJSON feature collection and dump that out.
-          </p>
-        </aside>
       </section>
 
       <section>
@@ -262,11 +167,6 @@ env $(xargs < "/home/ec2-user/cot-env.config") psql \
   -v ON_ERROR_STOP=1 \
   -f download_collisions.sql > collisions.geojson
         </code></pre>
-
-        <aside class="notes">
-          we store this SQL query in a file download_collisions.sql and run it, storing
-          its output into a GeoJSON file.
-        </aside>
       </section>
 
       <section>
@@ -284,11 +184,6 @@ async function initMapbox() {
   // ...
 }
         </code></pre>
-
-        <aside class="notes">
-          we can then use the Fetch API available in modern browsers to load this
-          data into a JavaScript object.
-        </aside>
       </section>
 
       <section>
@@ -314,45 +209,10 @@ map.addLayer({
   },
 });
         </code></pre>
-
-        <aside class="notes">
-          <p>
-            now the fun part.  we start with source: GeoJSON type, using our newly loaded
-            collisions data.  we then create layer: give it an ID, tie it to the collisions
-            source, and use type circle - we're going to draw circles for each data point.
-          </p>
-          <p>
-            in Mapbox GL, you can style your layers.  here we're telling it how to draw
-            these circles: what color, what outline, how big.
-          </p>
-
-        </aside>
       </section>
 
       <section data-background-interactive data-map-id="collisionsPoints">
-        <h2><span class="highlight">we can do better</span></h2>
-
-        <aside class="notes">
-          <p>
-            takes a while to load: as we'll discuss in a bit, Mapbox GL is doing a lot of work up
-            front to make sure we can navigate this smoothly once it loads.
-          </p>
-          <p></p>
-            the result is pretty jarring, and in more ways than one.  first: that's 150k collisions
-            over 3 years.  50k per year, 150 per day, 6 per hour.  even though most are minor, the
-            human impact of this is staggering.
-          </p>
-
-          <p>
-            this map doesn't do the dataset justice.  you can see there's a lot of collisions,
-            but it's impossible to get much more than that.
-          </p>
-
-          <p>
-            that said, once it loads, we can navigate pretty smoothly.  if you've ever tried loading
-            150k div markers on a mapping library, it's not this smooth.
-          </p>
-        </aside>
+        <h2 class="fragment"><span class="highlight">we can do better</span></h2>
       </section>
 
       <section>
