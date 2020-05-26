@@ -218,35 +218,12 @@ map.addLayer({
       <section>
         <h2>tiling</h2>
         <img class="stretch" src="img/tiling.png">
-
-        <aside class="notes">
-          <p>
-            so what is Mapbox GL doing in those first few seconds?  it's building vector tiles on the
-            fly!  pretty much every web map works this way: you divide your data into tiles at
-            different zoom levels.  at each zoom level, you split the previous level's tiles into
-            four smaller tiles.  you can then show different amounts of detail at different zoom levels.
-          </p>
-        </aside>
       </section>
 
       <section>
         <h2>your data on vector tiles</h2>
         <img class="fragment" src="img/flowchart-before.png">
         <img class="fragment" src="img/flowchart-after.png">
-
-        <aside class="notes">
-          <p>
-          note I said vector tiles.  in days of yore, you'd get your data out of database or
-          wherever as a shapefile, then you'd pick a style, then you'd render that data down
-          to raster image tiles, and you'd serve those pre-rendered tiles to the client.  if
-          you wanted to change the style, you had to rebuild your tiles from scratch.
-          </p>
-          <p>
-            now, we still need to get the data - this time in GeoJSON format - but we can send
-            that data down to the client, build vector tiles on the fly, then style them however
-            we want!  this makes it much faster to iterate on web maps.
-          </p>
-        </aside>
       </section>
 
       <section data-background-color="#ee0000">
@@ -256,49 +233,25 @@ map.addLayer({
           <li>how can we <em>understand</em> this much data?</li>
           <li class="fade">how can we <em>process</em> this much data?</li>
         </ul>
-
-        <aside class="notes">
-          so we can render data easily with Mapbox GL, and aside from a bit of loading time it
-          works with midsized datasets quite well.  we're still not helping users understand
-          this much data, though.  what can we do?  we'll explore three ways of dealing with
-          this:
-        </aside>
       </section>
 
       <section>
         <h2>what to do?</h2>
         <img class="stretch" src="img/clustering.png">
-
-        <aside class="notes">
-          clustering, where you group nearby points;
-        </aside>
       </section>
 
       <section>
         <h2>what to do?</h2>
         <img class="stretch" src="img/heatmap.png">
-
-        <aside class="notes">
-          heatmaps, where you blur points together;
-        </aside>
       </section>
 
       <section>
         <h2>what to do?</h2>
         <img class="stretch" src="img/visual-diff.png">
-
-        <aside class="notes">
-          and visual differentiation, where you style various parts of your data
-          in different ways.
-        </aside>
       </section>
 
       <section data-background-interactive data-map-id="collisionsClustered">
         <h2><span class="highlight">clustering</span></h2>
-
-        <aside class="notes">
-          group nearby points.  reduces clutter, but loses location precision!
-        </aside>
       </section>
 
       <section>
@@ -313,11 +266,6 @@ map.addSource('collisionsClustered', {
   clusterRadius: 30,
 });
         </code></pre>
-
-        <aside class="notes">
-          same GeoJSON source as before.  add cluster option.  we can change the cluster radius
-          to adjust the tradeoff between clutter and precision.
-        </aside>
       </section>
 
       <section>
@@ -328,22 +276,10 @@ map.addSource('collisionsClustered', {
           <li><code>'collisionsUnclustered'</code> for point circles</li>
         </ul>
         <img src="img/cluster-screenshot.png">
-
-        <aside class="notes">
-          to display this, we now need 3 layers instead of 1.  the first two draw the clustered
-          circles with a label showing how many points are in the cluster.  the last one handles
-          points that are by themselves, not in a cluster.  we need two for the clusters because
-          of how Mapbox GL styles work: we need to style the circle and the text separately.
-        </aside>
       </section>
 
       <section data-background-interactive data-map-id="collisionsHeatmap">
         <h2><span class="highlight">heatmaps</span></h2>
-
-        <aside class="notes">
-          blur points together.  good for visualizing density, but doesn't work so
-          well with sparse data.
-        </aside>
       </section>
 
       <section>
@@ -352,13 +288,6 @@ map.addSource('collisionsClustered', {
         	<img src="img/gaussian-kernel.png" height="400">
 				</div>
         <a href="https://github.com/mapbox/mapbox-gl-js/blob/master/src/shaders/heatmap.vertex.glsl">heatmap shader</a>
-
-        <aside class="notes">
-          heatmaps work by blurring your points across a radius, then adding all those
-          blurred points up.  by adding enough peaks and sides of peaks together, we get
-          hotspots.  math aside, the key here for our purposes is that this can be done
-          efficiently using GL shaders.
-        </aside>
       </section>
 
       <section>
@@ -402,21 +331,6 @@ map.addLayer({
   },
 });
         </code></pre>
-
-        <aside class="notes">
-          <p>
-            we can create a heatmap by using the heatmap layer type.
-          </p>
-          <p>
-            we have a lot of things we can adjust here.  we can define a color ramp to blend
-            seamlessly between heatmap intensity levels.  we can define a global intensity, which
-            we increase as we zoom in to compensate for points spreading out.  same with that
-            blur radius: we increase that too.
-          </p>
-          <p>
-            allows for weighting of points: maybe some are more important than others (e.g. KSI)!
-          </p>
-        </aside>
       </section>
 
       <section data-background-interactive data-map-id="collisionsAllTogetherNow">
